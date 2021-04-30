@@ -127,5 +127,8 @@
       }
     }
   },
-  "defaultProject": "design-patterns"
+  "defaultProject": "design-patterns",
+  "cli": {
+    "analytics": "ff46cb44-aaa5-48d1-adcc-c04568700fd3"
+  }
 }
