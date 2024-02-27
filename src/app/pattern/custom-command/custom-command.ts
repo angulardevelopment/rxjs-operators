@@ -5,7 +5,7 @@ export class CustomCommand<TExecute> {
   execute: Observable<TExecute>;
 
   private $canExecute = new ReplaySubject<boolean>(1);
-  private $unsubscribe = new Subject();
+  private $unsubscribe = new Subject<void>();
 
   private canExecuteFromArgs: Observable<boolean>;
   private canExecuteSubscription: Subscription;
@@ -13,7 +13,7 @@ export class CustomCommand<TExecute> {
 
 
   constructor(execute: Observable<TExecute>, canExecute: Observable<boolean> = of(true)) {
-    
+
     this.execute = execute;
     this.canExecuteFromArgs = canExecute;
     this.initCanExecuteSubscription();
@@ -46,7 +46,7 @@ export class CustomCommand<TExecute> {
       tap(() => {
         this.initCanExecuteSubscription();
         this.$canExecute.next(true);
-      }), 
+      }),
       finalize(() => {
         this.initCanExecuteSubscription();
         this.$canExecute.next(true);
