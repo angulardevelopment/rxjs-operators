@@ -1,0 +1,4 @@
+<input [(ngModel)]="search" (ngModelChange)="updateSearch($event)"/>
+<h1>switchMap</h1> {{ switch$ | async }}<hr />
+<h1>concatMap</h1> {{ concat$ | async }}<hr />
+<h1>mergeMap</h1> {{ merge$ | async }}<hr />
