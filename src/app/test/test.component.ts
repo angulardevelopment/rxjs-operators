@@ -12,6 +12,8 @@ import {
   take,
   tap,
   timer,
+  defer,
+  takeUntil,
 } from 'rxjs';
 
 import { fromFetch } from 'rxjs/fetch';
@@ -314,4 +316,91 @@ export class TestComponent implements OnInit {
     of([1, 2, 3]).subscribe((x) => console.log(x));
     from([1, 2, 3]).subscribe((x) => console.log(x));
   }
+
+  // closure example
+//  function basicCustomOperator<T>() {
+//   return function(source: Observable<T>) {
+//       return source;
+//   };
+
+
+exam(){
+function tapOnceFirstTry<T>(fn: (value) => void) {
+  return function(source: Observable<T>) {
+    const sub = source
+      .pipe(
+        take(1),
+        tap(value => fn(value))
+      )
+      .subscribe();
+    return source;
+  };
+}
+
+function tapOnce<T>(fn: (value) => void) {
+  return source =>
+    defer(() => {
+      let first = true;
+      return source.pipe(
+        tap(payload => {
+          if (first) {
+            fn(payload);
+          }
+          first = false;
+        })
+      );
+    });
+}
+
+function notSubscribingExample() {
+  const sourceSubject = new Subject();
+
+  const source = sourceSubject.pipe(
+    tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
+    tapOnce(x => console.log(`tapOnce ${x}`))
+  );
+
+  sourceSubject.next("1");
+  sourceSubject.next("2");
+  sourceSubject.next("3");
+}
+
+function multipleSubscriptionsExample() {
+  const sourceSubject = new Subject();
+
+  const source = sourceSubject.pipe(
+    tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
+    tapOnce(x => console.log(`tapOnce ${x}`))
+  );
+
+  source.subscribe();
+  source.subscribe();
+
+  sourceSubject.next("1");
+  sourceSubject.next("2");
+  sourceSubject.next("3");
+}
+
+function takeUntilExample() {
+  const sourceSubject = new Subject();
+  const takeUntilSubject = new Subject();
+
+  const source = sourceSubject.pipe(
+    tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
+    tapOnce(x => console.log(`tapOnce ${x}`)),
+    takeUntil(takeUntilSubject)
+  );
+
+  source.subscribe();
+
+  takeUntilSubject.next('');
+  sourceSubject.next("1");
+  sourceSubject.next("2");
+  sourceSubject.next("3");
+}
+
+takeUntilExample();
+notSubscribingExample()
+multipleSubscriptionsExample()
+}
 }
