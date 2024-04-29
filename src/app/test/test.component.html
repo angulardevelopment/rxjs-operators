@@ -5,7 +5,27 @@
     <li>combineLatest op</li>
     <li>catchError op</li>
     <li>customOperator</li>
-
-
-
   </ul>
+
+  <h1>Hello from {{ name }}!</h1>
+  <a target="_blank" href="https://angular.dev/overview">
+    Learn more about Angular
+  </a>
+    <div class="timer" *ngIf="(timeLeft$ | async) as t;">
+        <h4> Count down timer </h4>
+        <span id="hours"> {{t.hoursToDday}} </span>Hrs
+        <span id="minutes"> {{t.minutesToDday}} </span>Min
+        <span id="seconds"> {{t.secondsToDday}} </span>S
+      </div>
+<ul>
+<ng-template ngFor let-hero [ngForOf]="heroes">
+  <li>{{hero.name}}
+</ng-template>
+</ul>
+
+
+<input placeholder="Search" #input  list="dynmicUserIds"  >
+
+ <datalist id="dynmicUserIds">
+        <option *ngFor="let item of temp" [value]="item.cCourse">{{item.cCourse}}</option>
+      </datalist>

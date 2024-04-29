@@ -14,6 +14,10 @@ import {
   timer,
   defer,
   takeUntil,
+  debounceTime,
+  distinctUntilChanged,
+  forkJoin,
+  throwError,
 } from 'rxjs';
 
 import { fromFetch } from 'rxjs/fetch';
@@ -403,4 +407,211 @@ takeUntilExample();
 notSubscribingExample()
 multipleSubscriptionsExample()
 }
+
+
+name = 'Angular';
+heroes = [{name:'jhbj'}]
+public timeLeft$!: Observable<any>;
+public destroy$: Subject<void> = new Subject();
+dvadsfv = true;
+
+sfrdsra(){
+  //  console.log(new Date(), new Date().valueOf())
+//  const jknjk = new Date().valueOf();
+//       let endDay = new Date('2024-02-15T13:22:00Z').valueOf();
+// 	const timeDifference = endDay - jknjk;
+//   console.log(timeDifference)
+// 2024-02-15T10:56:45.380Z
+// this.sfrdsra();
+
+   function calcDateDiff()  {
+    // const tim = '2024 -02 - 20T16: 15:00Z';
+    // const tim = '2024-02-15T13:23:00Z';
+
+    /*
+     * 2023-08-20T20:21:00
+     *
+     */
+    /*
+
+*/
+
+    let endDay = new Date('2024-02-15T13:43:00Z');
+    let hjbkj = new Date().valueOf();
+
+    const dDay = endDay.valueOf();
+    // console.log(dDay, hjbkj, 'endDay');
+    const milliSecondsInASecond = 1000;
+    const hoursInADay = 24;
+    const minutesInAnHour = 60;
+    const secondsInAMinute = 60;
+
+    const timeDifference = dDay - hjbkj;
+
+    const hoursToDday = Math.floor(
+      (timeDifference /
+        (milliSecondsInASecond * minutesInAnHour * secondsInAMinute)) %
+      hoursInADay
+    );
+
+    const minutesToDday = Math.floor(
+      (timeDifference / (milliSecondsInASecond * minutesInAnHour)) %
+      secondsInAMinute
+    );
+
+    const secondsToDday =
+      Math.floor(timeDifference / milliSecondsInASecond) % secondsInAMinute;
+    console.log(secondsToDday, minutesToDday, hoursToDday, 'secondsToDday, minutesToDday, hoursToDday');
+
+    // if (!secondsToDday) {
+    // 	return { secondsToDday: 0, minutesToDday: 0, hoursToDday: 0 };
+    // }
+    return { secondsToDday, minutesToDday, hoursToDday };
+  }
+  // const hjb = calcDateDiff();
+  // if(this.dvadsfv){
+  this.timeLeft$ = interval(1000).pipe(
+    map((x) => {
+      console.log(x, 'x');
+
+      const hjb = calcDateDiff();
+      console.log(hjb, 'hjb');
+
+        if (!hjb?.secondsToDday) {
+this.dvadsfv = false;
+        }
+          return hjb;
+      //  }
+      // return { secondsToDday: 0, minutesToDday: 0, hoursToDday: 0 };
+    }),
+    // takeWhile(secondsToDday => secondsToDday > 0)
+  );
+  // }
 }
+
+ngOnDestroy() {
+this.destroy$.next();
+}
+
+
+REST_API_SERVER =
+    'https://bizcallcrmforms.com/response.php?section=filtertopcoursepage&coursekeyword=';
+    temp = [];
+  @ViewChild('input', { static: true }) input: ElementRef;
+
+  serversidesearch() {
+    fromEvent(this.input.nativeElement, 'keyup')
+      .pipe(
+        filter(Boolean),
+        debounceTime(1500),
+        distinctUntilChanged(),
+        tap((event: KeyboardEvent) => {
+          const val = this.input.nativeElement.value;
+          console.log(event);
+          console.log(this.input.nativeElement.value);
+          this.sendGetRequest(val).subscribe((data: any[]) => {
+            console.log(data);
+            this.temp = data['data'];
+          });
+        })
+      )
+      .subscribe();
+  }
+
+  public sendGetRequest(val) {
+    return this.http.get(this.REST_API_SERVER + val);
+  }
+
+  
+  withdelay() {
+    // https://rxjs.dev/deprecations/array-argument
+    const data$ = forkJoin(
+      of('a').pipe(delay(2000)),
+      of('b').pipe(delay(3000)),
+      of('c').pipe(delay(1000))
+    );
+    data$.subscribe(console.log); // ["a", "b", "c"]
+  }
+
+  withpromise() {
+    Promise.all([
+      Promise.resolve(3),
+      new Promise((resolve, reject) => setTimeout(resolve, 3000, 'hi')),
+      42,
+    ]).then((values) => console.log(values));
+    [3, 'hi', 42];
+  }
+
+  withTap() {
+    const data$ = forkJoin(
+      of('completed!'),
+      interval(1000).pipe(tap((i) => console.log(`tick ${i}`)))
+    );
+    data$.subscribe(console.log);
+  }
+
+  withHttp() {
+    console.log('http');
+
+    const api1 = this.getData('india');
+    const api2 = this.http.get('https://restcountries.eu/rest/v1/name/us');
+    const api3 = this.http.get('https://restcountries.eu/rest/v1/name/ame');
+    const api4 = this.http.get('https://restcountries.eu/rest/v1/name/ja');
+    // const responseData= [];
+    // responseData.push(request1);
+    // responseData.push(request2);
+    // responseData.push(request3);
+    // responseData.push(request4);
+    forkJoin([api1, api2]).subscribe(
+      (results) => {
+        console.log(results, 'results');
+        // this.data = results;
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  }
+
+  getData(val): Observable<any> {
+    return this.http.get('https://restcountries.eu/rest/v1/name/' + val);
+  }
+
+  uiUpdate(d): Observable<any> {
+    return of(d);
+  }
+  // non blocking code dont use combinelatest
+  makeitnonblocking() {
+    forkJoin([
+      this.getData('A').pipe(switchMap((p) => this.uiUpdate(p))),
+      this.getData('B').pipe(switchMap((p) => this.uiUpdate(p))),
+      this.getData('c').pipe(switchMap((p) => this.uiUpdate(p))),
+      this.getData('d').pipe(switchMap((p) => this.uiUpdate(p))),
+    ]).pipe((ord) => {
+      console.log('final', ord);
+      return ord;
+    });
+  }
+
+  multi() {
+    const api1 = '';
+    const api2 = '';
+    return forkJoin([api1, api2]).pipe(
+      map((result) => {
+        console.log(result);
+
+        return true;
+      }),
+      catchError((error: any) => {
+        return throwError(error);
+      })
+    );
+  }
+
+}
+
+interface timeComponents {
+  secondsToDday: number;
+  minutesToDday: number;
+  hoursToDday: number;
+  }
