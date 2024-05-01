@@ -1,0 +1,16 @@
+<h1>Signal example</h1>
+<div>
+  <label>
+    First name
+    <input [value]="firstName()" (input)="setName(firstName, $event)">
+  </label>
+</div>
+<div>
+  <label>
+    Last name
+    <input [value]="lastName()" (input)="setName(lastName, $event)">
+  </label>
+</div>
+
+<p>Full name (computed): {{ fullName() }}</p>
+<p>Full name (observable): {{ fullNameStream | async }}</p>

@@ -1,0 +1,23 @@
+<div>
+  <h2>Dumb 1.1 [Or Smart ?]</h2>
+
+
+  <h3> Using Component </h3>
+  <app-smart-store #smartStore>
+    <app-dumb2 [counter]="smartStore.data" (send)="smartStore.send($event)"></app-dumb2>
+    <app-dumb3 [counter]="smartStore.data" (send)="smartStore.send($event)"></app-dumb3>
+  </app-smart-store>
+
+  <!-- <h3> Using Directive </h3>
+  <ng-container appSmartStore #appSmartStore="appSmartStore">
+    <app-dumb2 [counter]="smartStore.data" (send)="appSmartStore.send($event)"></app-dumb2>
+    <app-dumb3 [counter]="appSmartStore.data" (send)="appSmartStore.send($event)">
+    </app-dumb3>
+  </ng-container>
+
+  <h3> Using Smart Parent Instance </h3>
+  <app-smart-state #smartState>
+    <app-dumb2 [counter]="smartState.smartComponent.data$ | async" (send)="smartState.smartComponent.set(0)">
+    </app-dumb2>
+  </app-smart-state> -->
+</div>

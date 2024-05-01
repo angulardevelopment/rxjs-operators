@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   catchError, from, observable, range, delay, filter,
-  combineLatest,  switchMap,mergeMap,fromEvent,exhaustMap,
+  combineLatest, switchMap, mergeMap, fromEvent, exhaustMap,
   concatMap,
   interval,
   map,
@@ -18,25 +18,28 @@ import {
   distinctUntilChanged,
   forkJoin,
   throwError,
+  BehaviorSubject,
+  Subscription,
 } from 'rxjs';
 
 import { fromFetch } from 'rxjs/fetch';
+const BTC_PRICE_HOST = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json';
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
   styleUrls: ['./test.component.scss']
 })
-export class TestComponent implements OnInit {
+export class TestComponent implements OnInit, OnDestroy {
   @ViewChild('saveButton') saveButton: ElementRef;
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.hgvjh();
+    // this.hgvjh();
   }
 
   ngAfterViewInit() {
-    this.exhaEg();
+    // this.exhaEg();
   }
 
   hgvjh() {
@@ -322,181 +325,184 @@ export class TestComponent implements OnInit {
   }
 
   // closure example
-//  function basicCustomOperator<T>() {
-//   return function(source: Observable<T>) {
-//       return source;
-//   };
+  //  function basicCustomOperator<T>() {
+  //   return function(source: Observable<T>) {
+  //       return source;
+  //   };
 
 
-exam(){
-function tapOnceFirstTry<T>(fn: (value) => void) {
-  return function(source: Observable<T>) {
-    const sub = source
-      .pipe(
-        take(1),
-        tap(value => fn(value))
-      )
-      .subscribe();
-    return source;
-  };
-}
+  exam() {
+    function tapOnceFirstTry<T>(fn: (value) => void) {
+      return function (source: Observable<T>) {
+        const sub = source
+          .pipe(
+            take(1),
+            tap(value => fn(value))
+          )
+          .subscribe();
+        return source;
+      };
+    }
 
-function tapOnce<T>(fn: (value) => void) {
-  return source =>
-    defer(() => {
-      let first = true;
-      return source.pipe(
-        tap(payload => {
-          if (first) {
-            fn(payload);
-          }
-          first = false;
-        })
+    function tapOnce<T>(fn: (value) => void) {
+      return source =>
+        defer(() => {
+          let first = true;
+          return source.pipe(
+            tap(payload => {
+              if (first) {
+                fn(payload);
+              }
+              first = false;
+            })
+          );
+        });
+    }
+
+    function notSubscribingExample() {
+      const sourceSubject = new Subject();
+
+      const source = sourceSubject.pipe(
+        tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
+        tapOnce(x => console.log(`tapOnce ${x}`))
       );
-    });
-}
 
-function notSubscribingExample() {
-  const sourceSubject = new Subject();
+      sourceSubject.next("1");
+      sourceSubject.next("2");
+      sourceSubject.next("3");
+    }
 
-  const source = sourceSubject.pipe(
-    tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
-    tapOnce(x => console.log(`tapOnce ${x}`))
-  );
+    function multipleSubscriptionsExample() {
+      const sourceSubject = new Subject();
 
-  sourceSubject.next("1");
-  sourceSubject.next("2");
-  sourceSubject.next("3");
-}
+      const source = sourceSubject.pipe(
+        tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
+        tapOnce(x => console.log(`tapOnce ${x}`))
+      );
 
-function multipleSubscriptionsExample() {
-  const sourceSubject = new Subject();
+      source.subscribe();
+      source.subscribe();
 
-  const source = sourceSubject.pipe(
-    tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
-    tapOnce(x => console.log(`tapOnce ${x}`))
-  );
+      sourceSubject.next("1");
+      sourceSubject.next("2");
+      sourceSubject.next("3");
+    }
 
-  source.subscribe();
-  source.subscribe();
+    function takeUntilExample() {
+      const sourceSubject = new Subject();
+      const takeUntilSubject = new Subject();
 
-  sourceSubject.next("1");
-  sourceSubject.next("2");
-  sourceSubject.next("3");
-}
+      const source = sourceSubject.pipe(
+        tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
+        tapOnce(x => console.log(`tapOnce ${x}`)),
+        takeUntil(takeUntilSubject)
+      );
 
-function takeUntilExample() {
-  const sourceSubject = new Subject();
-  const takeUntilSubject = new Subject();
+      source.subscribe();
 
-  const source = sourceSubject.pipe(
-    tapOnceFirstTry(x => console.log(`tapOnceFirstTry ${x}`)),
-    tapOnce(x => console.log(`tapOnce ${x}`)),
-    takeUntil(takeUntilSubject)
-  );
+      takeUntilSubject.next('');
+      sourceSubject.next("1");
+      sourceSubject.next("2");
+      sourceSubject.next("3");
+    }
 
-  source.subscribe();
-
-  takeUntilSubject.next('');
-  sourceSubject.next("1");
-  sourceSubject.next("2");
-  sourceSubject.next("3");
-}
-
-takeUntilExample();
-notSubscribingExample()
-multipleSubscriptionsExample()
-}
-
-
-name = 'Angular';
-heroes = [{name:'jhbj'}]
-public timeLeft$!: Observable<any>;
-public destroy$: Subject<void> = new Subject();
-dvadsfv = true;
-
-sfrdsra(){
-  //  console.log(new Date(), new Date().valueOf())
-//  const jknjk = new Date().valueOf();
-//       let endDay = new Date('2024-02-15T13:22:00Z').valueOf();
-// 	const timeDifference = endDay - jknjk;
-//   console.log(timeDifference)
-// 2024-02-15T10:56:45.380Z
-// this.sfrdsra();
-
-   function calcDateDiff()  {
-    // const tim = '2024 -02 - 20T16: 15:00Z';
-    // const tim = '2024-02-15T13:23:00Z';
-
-    /*
-     * 2023-08-20T20:21:00
-     *
-     */
-    /*
-
-*/
-
-    let endDay = new Date('2024-02-15T13:43:00Z');
-    let hjbkj = new Date().valueOf();
-
-    const dDay = endDay.valueOf();
-    // console.log(dDay, hjbkj, 'endDay');
-    const milliSecondsInASecond = 1000;
-    const hoursInADay = 24;
-    const minutesInAnHour = 60;
-    const secondsInAMinute = 60;
-
-    const timeDifference = dDay - hjbkj;
-
-    const hoursToDday = Math.floor(
-      (timeDifference /
-        (milliSecondsInASecond * minutesInAnHour * secondsInAMinute)) %
-      hoursInADay
-    );
-
-    const minutesToDday = Math.floor(
-      (timeDifference / (milliSecondsInASecond * minutesInAnHour)) %
-      secondsInAMinute
-    );
-
-    const secondsToDday =
-      Math.floor(timeDifference / milliSecondsInASecond) % secondsInAMinute;
-    console.log(secondsToDday, minutesToDday, hoursToDday, 'secondsToDday, minutesToDday, hoursToDday');
-
-    // if (!secondsToDday) {
-    // 	return { secondsToDday: 0, minutesToDday: 0, hoursToDday: 0 };
-    // }
-    return { secondsToDday, minutesToDday, hoursToDday };
+    takeUntilExample();
+    notSubscribingExample()
+    multipleSubscriptionsExample()
   }
-  // const hjb = calcDateDiff();
-  // if(this.dvadsfv){
-  this.timeLeft$ = interval(1000).pipe(
-    map((x) => {
-      console.log(x, 'x');
 
-      const hjb = calcDateDiff();
-      console.log(hjb, 'hjb');
+
+  name = 'Angular';
+  heroes = [{ name: 'jhbj' }]
+  public timeLeft$!: Observable<any>;
+  public destroy$: Subject<void> = new Subject();
+  dvadsfv = true;
+
+  sfrdsra() {
+    //  console.log(new Date(), new Date().valueOf())
+    //  const jknjk = new Date().valueOf();
+    //       let endDay = new Date('2024-02-15T13:22:00Z').valueOf();
+    // 	const timeDifference = endDay - jknjk;
+    //   console.log(timeDifference)
+    // 2024-02-15T10:56:45.380Z
+    // this.sfrdsra();
+
+    function calcDateDiff() {
+      // const tim = '2024 -02 - 20T16: 15:00Z';
+      // const tim = '2024-02-15T13:23:00Z';
+
+      /*
+       * 2023-08-20T20:21:00
+       *
+       */
+      /*
+
+  */
+
+      let endDay = new Date('2024-02-15T13:43:00Z');
+      let hjbkj = new Date().valueOf();
+
+      const dDay = endDay.valueOf();
+      // console.log(dDay, hjbkj, 'endDay');
+      const milliSecondsInASecond = 1000;
+      const hoursInADay = 24;
+      const minutesInAnHour = 60;
+      const secondsInAMinute = 60;
+
+      const timeDifference = dDay - hjbkj;
+
+      const hoursToDday = Math.floor(
+        (timeDifference /
+          (milliSecondsInASecond * minutesInAnHour * secondsInAMinute)) %
+        hoursInADay
+      );
+
+      const minutesToDday = Math.floor(
+        (timeDifference / (milliSecondsInASecond * minutesInAnHour)) %
+        secondsInAMinute
+      );
+
+      const secondsToDday =
+        Math.floor(timeDifference / milliSecondsInASecond) % secondsInAMinute;
+      console.log(secondsToDday, minutesToDday, hoursToDday, 'secondsToDday, minutesToDday, hoursToDday');
+
+      // if (!secondsToDday) {
+      // 	return { secondsToDday: 0, minutesToDday: 0, hoursToDday: 0 };
+      // }
+      return { secondsToDday, minutesToDday, hoursToDday };
+    }
+    // const hjb = calcDateDiff();
+    // if(this.dvadsfv){
+    this.timeLeft$ = interval(1000).pipe(
+      map((x) => {
+        console.log(x, 'x');
+
+        const hjb = calcDateDiff();
+        console.log(hjb, 'hjb');
 
         if (!hjb?.secondsToDday) {
-this.dvadsfv = false;
+          this.dvadsfv = false;
         }
-          return hjb;
-      //  }
-      // return { secondsToDday: 0, minutesToDday: 0, hoursToDday: 0 };
-    }),
-    // takeWhile(secondsToDday => secondsToDday > 0)
-  );
-  // }
-}
+        return hjb;
+        //  }
+        // return { secondsToDday: 0, minutesToDday: 0, hoursToDday: 0 };
+      }),
+      // takeWhile(secondsToDday => secondsToDday > 0)
+    );
+    // }
+  }
 
-ngOnDestroy() {
-this.destroy$.next();
-}
+  ngOnDestroy() {
+    // this.destroy$.next();
+
+    // dispose of the observable with unsubscribe() method.
+    // this.simpleObservable.unsubscribe();
+  }
 
 
-REST_API_SERVER =
+  REST_API_SERVER =
     'https://bizcallcrmforms.com/response.php?section=filtertopcoursepage&coursekeyword=';
-    temp = [];
+  temp = [];
   @ViewChild('input', { static: true }) input: ElementRef;
 
   serversidesearch() {
@@ -522,7 +528,7 @@ REST_API_SERVER =
     return this.http.get(this.REST_API_SERVER + val);
   }
 
-  
+
   withdelay() {
     // https://rxjs.dev/deprecations/array-argument
     const data$ = forkJoin(
@@ -608,10 +614,116 @@ REST_API_SERVER =
     );
   }
 
+  simpleObservable: Observable<string>;
+  simpleSubject = new Subject();
+  subscription: Subscription;
+
+  simpleSubject$ = this.simpleSubject.asObservable(); // prefer to use like that
+
+  readonly asyncExample = of(1).pipe(map((etaMinutes) => etaMinutes * 60));
+
+  // error handling with async pipe
+  priceError: string;
+  bitcoinPrice$ = interval(5000).pipe(
+      switchMap(() => this.http.get<{ last: number }>(BTC_PRICE_HOST)),
+      map(data => data.last),
+      catchError((e: HttpErrorResponse) => {
+          this.priceError = e.message;
+          return throwError(() => e.message)
+      })
+  );
+
+  // bitcoinPrice$ = interval(1000).pipe(
+  //   switchMap(() => this.http.get<any>(BTC_PRICE_HOST)),
+  //   map((data) => data),
+  //   catchError((e: HttpErrorResponse) => {
+  //     this.priceError = e.message;
+  //     return throwError(() => e.message);
+  //   })
+  // );
+
+  sub1 = new Subject();
+  sub2 = new BehaviorSubject(2);
+
+  SubjectEg() {
+    let output = '';
+
+    this.sub1.next('1');
+
+    this.sub2.subscribe((val) => {
+      console.log(output, 'behSubject');
+      output += val;
+    });
+
+    this.sub1.subscribe((val) => {
+      console.log(output, 'Subject');
+      output += val;
+    });
+
+    console.log(output, 'output');
+  }
+
+  createobs() {
+    this.simpleObservable = new Observable((observer) => {
+      observer.next('hlo' + Math.random()); // observable execution
+      observer.complete();
+    });
+
+    // var observable = interval(1000);
+    //   this.subscription = observable.subscribe(x => console.log(x));
+  }
+
+  getobs() {
+    // subscribe to the observable
+    this.simpleObservable.subscribe((data) => {
+      console.log(data, 'simpleObservable'); //"hlo"
+    });
+    this.simpleObservable.subscribe((res) => {
+      console.log('subscription a :', res); //subscription a :0.2859800202682865
+    });
+
+    this.simpleObservable.subscribe((res) => {
+      console.log('subscription b :', res); //subscription b :0.694302021731573
+    });
+  }
+
+  getsub() {
+    this.simpleSubject.subscribe((res) => {
+      console.log('subscription a :', res); // subscription a : 0.91767565496093
+    });
+
+    this.simpleSubject.subscribe((res) => {
+      console.log('subscription b :', res); // subscription b : 0.91767565496093
+    });
+  }
+
+  createsub() {
+    this.simpleSubject.next(Math.random());
+  }
+
+  createbehsub() {
+    const subject = new BehaviorSubject(0);
+    subject.next(1);
+    subject.subscribe((x) => console.log(x));
+  }
+
+  // How to execute 2 Observables in parallel
+  ObservablesEg() {
+    const ob1 = new Observable<string>((observer) => {
+      console.log('observable 1 called');
+    });
+
+    const ob2 = new Observable<string>((observer) => {
+      console.log('observable 2 called');
+    });
+  }
+
+
+
 }
 
 interface timeComponents {
   secondsToDday: number;
   minutesToDday: number;
   hoursToDday: number;
-  }
+}
