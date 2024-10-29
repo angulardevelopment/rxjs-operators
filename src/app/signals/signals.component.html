@@ -14,3 +14,7 @@
 
 <p>Full name (computed): {{ fullName() }}</p>
 <p>Full name (observable): {{ fullNameStream | async }}</p>
+
+@for (book of books()) {
+  <p>{{book.title}}</p>
+}

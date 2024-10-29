@@ -18,6 +18,8 @@ export class SignalsComponent {
   );
 
   protected readonly fullNameStream = toObservable(this.fullName);
+  readonly bookService = inject(BookService);
+  readonly books = toSignal(this.bookService.getAll());
 
   constructor() {
     effect(() => {
