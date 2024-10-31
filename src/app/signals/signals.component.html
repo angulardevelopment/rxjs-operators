@@ -15,6 +15,6 @@
 <p>Full name (computed): {{ fullName() }}</p>
 <p>Full name (observable): {{ fullNameStream | async }}</p>
 
-@for (book of books()) {
+@for (book of books(); track book.id;) {
   <p>{{book.title}}</p>
 }

@@ -1,8 +1,10 @@
 import { Component,  computed,
   effect,
+  inject,
   signal,
   WritableSignal, } from '@angular/core';
-  import { toObservable } from '@angular/core/rxjs-interop';
+  import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { BookService } from '../book.service';
 
 @Component({
   selector: 'app-signals',
