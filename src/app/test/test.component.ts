@@ -557,7 +557,7 @@ export class TestComponent implements OnInit, OnDestroy {
   }
 
   withHttp() {
-    console.log('http');
+    console.log('multiple req');
 
     const api1 = this.getData('india');
     const api2 = this.http.get('https://restcountries.eu/rest/v1/name/us');
