@@ -558,6 +558,21 @@ export class TestComponent implements OnInit, OnDestroy {
 
   withHttp() {
     console.log('multiple req');
+    const request3 = this.http.get('https://restcountries.eu/rest/v1/name/');
+    // Testcase:
+    // To test this change the third API URL so that it breaks and show an error.
+    // Now console will show this error so that we can correct this easily-
+    // {
+    // HttpErrorResponse {headers: {...}, status: 404, statusText: "OK", url: "https://restcountries.eu/rest/v1/name/"...}
+    // error: null
+    // headers: HttpHeaders
+    // message: "Http failure response for https://restcountries.eu/rest/v1/name/: 404 OK"
+    // name: "HttpErrorResponse"
+    // ok: false
+    // status: 404
+    // statusText: "OK"
+    // url: "https://restcountries.eu/rest/v1/name/"
+    // }
 
     const api1 = this.getData('india');
     const api2 = this.http.get('https://restcountries.eu/rest/v1/name/us');
