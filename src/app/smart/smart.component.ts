@@ -5,7 +5,8 @@ import { SmartStoreService } from "./smart-store.service";
 @Component({
   selector: "app-smart",
   templateUrl: "./smart.component.html",
-  providers: [SmartStoreService]
+  providers: [SmartStoreService],
+  standalone: false
 })
 export class SmartComponent implements OnInit {
   @Input() user;
@@ -27,14 +28,15 @@ export class SmartComponent implements OnInit {
 
   ngOnInit() {}
 
-  
+
 }
 
 @Component({
   selector: "app-smart-state",
   template: `
     <ng-content></ng-content>
-  `
+  `,
+  standalone: false
 })
 export class SmartStateComponent {
   constructor(public smartComponent: SmartComponent) {}

@@ -27,7 +27,8 @@ const BTC_PRICE_HOST = 'https://api.coindesk.com/v1/bpi/currentprice/BTC.json';
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
-  styleUrls: ['./test.component.scss']
+  styleUrls: ['./test.component.scss'],
+  standalone: false
 })
 export class TestComponent implements OnInit, OnDestroy {
   @ViewChild('saveButton') saveButton: ElementRef;

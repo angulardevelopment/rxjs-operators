@@ -2,13 +2,13 @@
 <div>
   <label>
     First name
-    <input [value]="firstName()" (input)="setName(firstName, $event)">
+    <input [value]="firstName()" (input)="setName(firstName, $event)" />
   </label>
 </div>
 <div>
   <label>
     Last name
-    <input [value]="lastName()" (input)="setName(lastName, $event)">
+    <input [value]="lastName()" (input)="setName(lastName, $event)" />
   </label>
 </div>
 
@@ -16,5 +16,5 @@
 <p>Full name (observable): {{ fullNameStream | async }}</p>
 
 @for (book of books(); track book.id;) {
-  <p>{{book.title}}</p>
+<p>{{ book.title }}</p>
 }

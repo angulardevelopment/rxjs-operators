@@ -6,7 +6,8 @@ import { createCustomCommand } from "./custom-command/custom-command";
 @Component({
   selector: 'app-pattern',
   templateUrl: './pattern.component.html',
-  styleUrls: ['./pattern.component.scss']
+  styleUrls: ['./pattern.component.scss'],
+  standalone: false
 })
 export class PatternComponent {
 

@@ -10,7 +10,8 @@ import {
 @Component({
   selector: "app-dumb2",
   templateUrl: "./dumb2.component.html",
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false
 })
 export class Dumb2Component {
   @Input() counter = 0;

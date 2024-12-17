@@ -6,7 +6,8 @@ import { SmartStoreService } from "./smart-store.service";
   selector: "app-smart-store",
   template: `
     <ng-content></ng-content>
-  `
+  `,
+  standalone: false
 })
 export class SmartStoreComponent extends SmartStoreDirective {
   constructor(smartService: SmartStoreService, cd: ChangeDetectorRef) {

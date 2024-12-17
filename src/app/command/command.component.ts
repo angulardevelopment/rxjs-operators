@@ -14,7 +14,8 @@ import {
 @Component({
   selector: "app-command",
   templateUrl: "./command.component.html",
-  styleUrls: ["./command.component.css"]
+  styleUrls: ["./command.component.css"],
+  standalone: false
 })
 export class CommandComponent implements OnInit {
   public readonly name = "Angular " + VERSION.major;

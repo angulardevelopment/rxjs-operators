@@ -4,7 +4,8 @@ import { SmartStoreService } from "./smart-store.service";
 
 @Directive({
   selector: "[appSmartStore]",
-  exportAs: "appSmartStore"
+  exportAs: "appSmartStore",
+  standalone: false
 })
 export class SmartStoreDirective {
   value: number;
