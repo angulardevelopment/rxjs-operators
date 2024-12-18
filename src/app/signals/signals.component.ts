@@ -1,11 +1,18 @@
 import {
+  afterRenderEffect,
   Component,
   computed,
+  Directive,
   effect,
+  ElementRef,
   inject,
+  input,
+  linkedSignal,
+  resource,
   Signal,
   signal,
   untracked,
+  viewChild,
   WritableSignal,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -98,6 +105,47 @@ export class SignalsComponent {
   todo() {
     return { id: 2 };
   }
+
+  options = signal([
+    'apple',
+    'banana',
+    'fig'
+  ]);
+
+  choice = linkedSignal(
+    () => this.options()[0]
+  );
+
+    userId = input<number>();
+    // Data fetching
+    user = resource({
+      request: () => this.userId(),
+      loader: async ({ request: id }) =>
+        await this.bookService.getUser(id),
+    });
+
+    // user = httpResource(() =>
+    //  `/data/user/${this.userIdid()}`
+    // );
+
+    // user = httpResource(() => ({
+    //   method: 'GET',
+    //   url: `/data/${id()}`,
+    //   headers: {
+    //       'X-Page': this.page(),
+    //   }
+    // }));
+
+    // Data stored in signals
+    data = signal({
+      first: "Pawel",
+      last: "K",
+    });
+
+    // Form state derived from data
+    // form = signalForm(this.data);
+
+
 }
 
 export interface Todo {
@@ -106,3 +154,30 @@ export interface Todo {
   title: string;
   completed: boolean;
 }
+
+@Directive()
+export class UserProfile {
+  first = input<string>();
+  last  = input.required<string>();
+
+  fullName = computed(() =>
+    this.first() ?
+      `${this.first()} ${this.last()}`:
+      this.last()
+  );
+}
+
+@Directive()
+export class App {
+  firstItem = viewChild<ElementRef>('item');
+
+  constructor() {
+    afterRenderEffect(() => {
+ this.firstItem()?.nativeElement.focus();
+    });
+  }
+}
+
+
+
+

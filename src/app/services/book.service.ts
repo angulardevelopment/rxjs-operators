@@ -11,4 +11,8 @@ export class BookService {
   getAll(){
     return of([])
   }
+
+  getUser(id){
+console.log(id)
+  }
 }

@@ -18,3 +18,12 @@
 @for (book of books(); track book.id;) {
 <p>{{ book.title }}</p>
 }
+
+@if (user.isLoading()) {
+  Loading....
+     } @else {
+       <!-- <user-profile [user]="user.value()" /> -->
+     }
+
+     <!-- <input [field]="form.fields.first">
+     <input [field]="form.fields.last"> -->
