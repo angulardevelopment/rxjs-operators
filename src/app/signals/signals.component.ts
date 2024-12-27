@@ -145,7 +145,28 @@ export class SignalsComponent {
     // Form state derived from data
     // form = signalForm(this.data);
 
+    quantity = signal(1);
 
+    qtyAvailable = signal([1, 2, 3, 4, 5, 6]);
+
+    selectedVehicle = signal<Vehicle>({
+      id: 1,
+      name: 'AT-AT',
+      price: 19416.13
+    });
+
+    vehicles = signal<Vehicle[]>([]);
+
+    onQuantitySelected(qty: number) {
+      this.quantity.set(qty);
+
+      this.quantity.set(5);
+      this.quantity.set(42);
+    }
+
+    totalPrice = computed(() => this.selectedVehicle().price * this.quantity());
+
+    color = computed(() => this.totalPrice() > 50000 ? 'green' : 'blue');
 }
 
 export interface Todo {
@@ -155,6 +176,11 @@ export interface Todo {
   completed: boolean;
 }
 
+export interface  Vehicle{
+  id: number;
+  name: string,
+  price: number
+}
 @Directive()
 export class UserProfile {
   first = input<string>();

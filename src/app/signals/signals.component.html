@@ -27,3 +27,13 @@
 
      <!-- <input [field]="form.fields.first">
      <input [field]="form.fields.last"> -->
+
+     <select
+    [ngModel]="quantity()"
+    (change)="onQuantitySelected($any($event.target).value)">
+  <option *ngFor="let q of qtyAvailable()">{{ q }}</option>
+</select>
+
+<div>Vehicle: {{ selectedVehicle().name }}</div>
+<div>Price: {{ selectedVehicle().price }}</div>
+<div [style.color]="color()">Total: {{ totalPrice() }}</div>
