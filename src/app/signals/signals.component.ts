@@ -205,5 +205,90 @@ export class App {
 }
 
 
+// ou can think of a signal as a value plus a change notification. A signal is just a special type of variable that holds a value
+
+// Signals let us understand changes to the data model (what gets modified) and how the model is used (templates that need update).
+
+// With this precise info we can just update templates that read changed values, instead of dirty-checking the entire application / all templates.
+
+// A side observation is that we are getting more and more streams (like media capture) in the browser. Signals are a great way create a reactive interface to those streams. And that is something that is going to be more and more important in the future.
+
+// You can still use Observables. You can still use Promises. You can still use the async pipe.
+
+// The problem Angular Signals solves is:
+
+// Adds the missing reactive primitive in Javascript.
+
+// Allows very fine-grained control over when and how the view is updated.
+
+// Enables future zone-less applications.
+
+// Bridge the gap between the imperative and reactive world
+
+// RxJs follows the observer pattern, where you have an observable that emits values, and observers that subscribe to receive and react to those values. Signals, on the other hand, are a concept used in some programming languages and frameworks for handling events and asynchronous operations.
+
+// Example-
+
+// let x = 5;
+// let y = 3;
+// let z = x + y;
+// console.log(z);
+
+// let x = 5;
+// let y = 3;
+// let z = x + y;
+// console.log(z);
+
+// x = 10;
+// console.log(z);
+
+// It still logs out 8! That's because a value is assigned to z when the expression is first evaluated. The z variable does not react to changes in x or y.
+
+// const x = signal(5);
+// const y = signal(3);
+// const z = computed(() => x() + y());
+// console.log(z()); // 8
+
+// x.set(10);
+// console.log(z()); // 13
+
+// if you use signal it react to those changes.
+
+// Reactivity. Powered by signals.
+// Reactive inputs, model and queries:
+// participate in the reactive graph;
+// improved type safety;
+// reviewed and simplified API surface;
+// Reactive inputs, model, queries and outputs are stable in Angular v19.
+
+// $ ng generate @angular/core:signals
+
+// // or run individual, focused migrations
+// @angular/core:signal-input-migration
+// @angular/core:signal-queries-migration
+// @angular/core:output-migration
+
+// New reactive primitives:
+// afterRenderEffect -> Combines effect + afterRender hook:
+// effect track reactive dependencies
+// runs when it is safe to do changes to the DOM
+
+// linkedSignal -> State that depends on another reactive state:
+// It is a writable signal
+// Initialized and reset based on the dependencies change.
+// Describes a relationship without using effects.
+
+// signals meet async data: resource
+// Asynchronous data meet signals:
+// Asynchronously loads data in response to dependencies change
+// Exposes loaded data as signal
+// Loading and error states are signals too
+// There is a rxResource version
+
+// httpResource-
+// resource wrapping HTTPClient:
+// Reusing existing interceptors
+// Testing story is here as well
+// Simplified API , More advanced API version
 
 
