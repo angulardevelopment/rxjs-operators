@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router, Routes } from '@angular/router';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -31,5 +32,15 @@ export class AppComponent {
     mySubject.next(4);
 
     // Behavior subjects: are similar to replay subjects, but will re-emit only the last emitted value, or a default value if no value has been previously emitted:
+  }
+
+  routes: Routes = [];
+
+  constructor(private router: Router) {}
+
+  ngAfterViewInit(): void {
+    // Fetch the routes from the router
+    this.routes = this.router.config;
+    console.log(this.routes);
   }
 }
