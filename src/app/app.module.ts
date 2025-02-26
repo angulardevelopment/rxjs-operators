@@ -18,6 +18,7 @@ import { Dumb1Component } from "./dumb/dumb1/dumb1.component";
 import { Dumb2Component } from "./dumb/dumb1/dumb2/dumb2.component";
 import { Dumb3Component } from "./dumb/dumb1/dumb3/dumb3.component";
 import { SignalsComponent } from './signals/signals.component';
+import { AsynchronousDataComponent } from "./resource-api-demo/asynchronous-data/asynchronous-data.component";
 @NgModule({
   declarations: [AppComponent, PatternComponent, CommandComponent, TestComponent, SearchComponent,
     SmartComponent,
@@ -29,6 +30,7 @@ import { SignalsComponent } from './signals/signals.component';
     Dumb2Component,
     Dumb3Component,
     SignalsComponent,
+    AsynchronousDataComponent
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule, FormsModule],
   providers: [],

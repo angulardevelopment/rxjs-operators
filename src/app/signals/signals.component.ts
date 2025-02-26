@@ -25,6 +25,49 @@ import { BookService } from '../services/book.service';
   standalone: false
 })
 export class SignalsComponent {
+  protected readonly firstName = signal('demo');
+  protected readonly lastName = signal('new');
+  protected readonly fullName = computed(
+    () => `${this.firstName()} ${this.lastName()}`
+  );
+  protected readonly fullNameStream = toObservable(this.fullName);
+  readonly bookService = inject(BookService);
+  readonly books = toSignal(this.bookService.getAll());
+
+  userId = input<number>(1);
+  // Data fetching
+  user = resource({
+    request: () => this.userId(),
+    loader: async ({ request: id }) =>{
+      const response = await this.bookService.getUser(id).toPromise();
+    return response;
+  }
+  });
+
+  userData(){
+    console.log('user:', this.user.value());
+  }
+  // user = httpResource(() =>
+  //  `/data/user/${this.userIdid()}`
+  // );
+
+  // user = httpResource(() => ({
+  //   method: 'GET',
+  //   url: `/data/${id()}`,
+  //   headers: {
+  //       'X-Page': this.page(),
+  //   }
+  // }));
+
+  constructor() {
+    effect(() => {
+      console.log(`${this.fullName()} updated`);
+    });
+  }
+
+  ngOnInit(): void {
+   
+  }
 
   Test() {
     // Creating and reading a signal:
@@ -50,21 +93,6 @@ export class SignalsComponent {
       console.log(
         `User set to ${currentUser()} and the counter is ${untracked(count)}`
       );
-    });
-  }
-  protected readonly firstName = signal('demo');
-  protected readonly lastName = signal('new');
-  protected readonly fullName = computed(
-    () => `${this.firstName()} ${this.lastName()}`
-  );
-
-  protected readonly fullNameStream = toObservable(this.fullName);
-  readonly bookService = inject(BookService);
-  readonly books = toSignal(this.bookService.getAll());
-
-  constructor() {
-    effect(() => {
-      console.log(`${this.fullName()} updated`);
     });
   }
 
@@ -112,29 +140,15 @@ export class SignalsComponent {
     'fig'
   ]);
 
+  // linkedSignal works similarly to signal with one key difference— instead of passing a default value, you pass a computation function, just like computed. When the value of the computation changes, the value of the linkedSignal changes to the computation result. This is useful when you want to create a signal that depends on another signal.
   choice = linkedSignal(
     () => this.options()[0]
   );
 
-    userId = input<number>();
-    // Data fetching
-    user = resource({
-      request: () => this.userId(),
-      loader: async ({ request: id }) =>
-        await this.bookService.getUser(id),
-    });
-
-    // user = httpResource(() =>
-    //  `/data/user/${this.userIdid()}`
-    // );
-
-    // user = httpResource(() => ({
-    //   method: 'GET',
-    //   url: `/data/${id()}`,
-    //   headers: {
-    //       'X-Page': this.page(),
-    //   }
-    // }));
+  setOption(option: string) {
+    this.choice.set(option);
+    console.log('Option:', this.choice());
+  }
 
     // Data stored in signals
     data = signal({

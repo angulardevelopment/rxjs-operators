@@ -62,8 +62,16 @@
                   "maximumError": "4kb"
                 }
               ]
+            },
+            "development": {
+              "optimization": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "aot": false,
+              "buildOptimizer": false
             }
-          }
+          },
+           "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -73,7 +81,11 @@
           "configurations": {
             "production": {
               "buildTarget": "design-patterns:build:production"
-            }
+            },
+                
+			  "development": {
+          "buildTarget": "design-patterns:build:development"
+        }
           }
         },
         "extract-i18n": {
@@ -127,7 +139,6 @@
       }
     }
   },
-  "defaultProject": "design-patterns",
   "cli": {
     "analytics": "ff46cb44-aaa5-48d1-adcc-c04568700fd3"
   }
