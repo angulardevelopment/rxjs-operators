@@ -17,6 +17,7 @@ import {
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { BookService } from '../services/book.service';
+import { z } from "zod";
 
 @Component({
   selector: 'app-signals',
@@ -44,8 +45,40 @@ export class SignalsComponent {
   }
   });
 
+  id1 = signal (1);
+
+  swPersonResource = resource({
+    // request: () => `https://swapi.dev/api/people/${this.id1()}`,
+    request: () => this.id1(),
+    
+    loader: async ({ request, abortSignal }) => {
+      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${request}`, {
+        signal: abortSignal,
+      });
+
+      if (!response.ok) throw new Error("Unable to load users!");
+      return (await response.json());
+  }
+  });
+
+  swPersonResource1 = resource({
+    request: () => this.id1(),
+    
+    loader: async ({ request, abortSignal }) => {
+      const response = await fetch(`https://swapi.dev/api/people/${request}`, {
+        signal: abortSignal,
+      });
+
+      if (!response.ok) throw new Error("Unable to load users!");
+      return (await response.json());
+  }
+  });
+
+  
+
+  
   userData(){
-    console.log('user:', this.user.value());
+    console.log('user:', this.user.value(), this.swPersonResource.value(), this.swPersonResource1.value());
   }
   // user = httpResource(() =>
   //  `/data/user/${this.userIdid()}`
@@ -65,8 +98,8 @@ export class SignalsComponent {
     });
   }
 
-  ngOnInit(): void {
-   
+  ngAfterViewInit(): void {
+   console.log(this);
   }
 
   Test() {
@@ -181,8 +214,9 @@ export class SignalsComponent {
     totalPrice = computed(() => this.selectedVehicle().price * this.quantity());
 
     color = computed(() => this.totalPrice() > 50000 ? 'green' : 'blue');
-}
 
+ 
+}
 export interface Todo {
   userId: number;
   id: number;
@@ -306,3 +340,12 @@ export class App {
 // Simplified API , More advanced API version
 
 
+
+  // Zod Schema
+  export const starWarsPersonSchema = z.object({
+    name: z.string(),
+    height: z.number({ coerce: true }),
+    edited: z.string().datetime(),
+    films: z.array(z.string()),
+    title: z.string(),
+    })
