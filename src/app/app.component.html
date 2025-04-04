@@ -2,9 +2,11 @@
   reactive framework
 signal based reactivity
 </p>
+<button (click)="showHideRouteBlock()">Show/Hide</button>
+
 <div *ngIf="routes && routes.length">
-  <h2>Available Routes</h2>
-  <ul>
+  <h2>Available Features</h2>
+  <ul *ngIf="showText">
     <li *ngFor="let route of routes">
       <a [routerLink]="route.path">{{ route.path }} (Component: {{ route.component.name }})</a>
     </li>

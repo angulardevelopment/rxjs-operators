@@ -18,6 +18,8 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { BookService } from '../services/book.service';
 import { z } from "zod";
+import { ApiService, Todo } from '../resource-api-demo/api.service';
+import { BehaviorSubject, from, map, Observable, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-signals',
@@ -26,8 +28,30 @@ import { z } from "zod";
   standalone: false
 })
 export class SignalsComponent {
-  protected readonly firstName = signal('demo');
-  protected readonly lastName = signal('new');
+  constructor(public api: ApiService) {
+    // only be used within an injection context such as a constructor
+    effect(() => {
+      console.log(`${this.fullName()} updated`);
+    });
+
+        // Creating an effect:
+        effect(() => {
+          console.log(`The current count is: ${this.count1()}`);
+        });
+
+        effect(() => {
+          console.log(
+            `User set to ${this.currentUser()} and the counter is ${untracked(this.count)}`
+          );
+        });
+  }
+
+  ngOnInit() {
+    this.creatingReadingSignal();
+    }
+
+  protected readonly firstName = signal('first');     // Data stored in signals
+  protected readonly lastName = signal('last');
   protected readonly fullName = computed(
     () => `${this.firstName()} ${this.lastName()}`
   );
@@ -35,52 +59,7 @@ export class SignalsComponent {
   readonly bookService = inject(BookService);
   readonly books = toSignal(this.bookService.getAll());
 
-  userId = input<number>(1);
-  // Data fetching
-  user = resource({
-    request: () => this.userId(),
-    loader: async ({ request: id }) =>{
-      const response = await this.bookService.getUser(id).toPromise();
-    return response;
-  }
-  });
-
-  id1 = signal (1);
-
-  swPersonResource = resource({
-    // request: () => `https://swapi.dev/api/people/${this.id1()}`,
-    request: () => this.id1(),
-    
-    loader: async ({ request, abortSignal }) => {
-      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${request}`, {
-        signal: abortSignal,
-      });
-
-      if (!response.ok) throw new Error("Unable to load users!");
-      return (await response.json());
-  }
-  });
-
-  swPersonResource1 = resource({
-    request: () => this.id1(),
-    
-    loader: async ({ request, abortSignal }) => {
-      const response = await fetch(`https://swapi.dev/api/people/${request}`, {
-        signal: abortSignal,
-      });
-
-      if (!response.ok) throw new Error("Unable to load users!");
-      return (await response.json());
-  }
-  });
-
-  
-
-  
-  userData(){
-    console.log('user:', this.user.value(), this.swPersonResource.value(), this.swPersonResource1.value());
-  }
-  // user = httpResource(() =>
+    // user = httpResource(() =>
   //  `/data/user/${this.userIdid()}`
   // );
 
@@ -91,68 +70,144 @@ export class SignalsComponent {
   //       'X-Page': this.page(),
   //   }
   // }));
-
-  constructor() {
-    effect(() => {
-      console.log(`${this.fullName()} updated`);
+  todo = 
+  resource({
+    request: () => this.id(), // Request function to get the ID
+    loader: async ({ request: id }) => {
+      const response: Todo = await this.api.getTodoById(id).toPromise(); // Fetch todo based on the ID
+      return response;
+    }
     });
+  
+  // Define id as a BehaviorSubject (RxJS way of handling state)
+  // id$ = new BehaviorSubject<number>(1);
+
+  // // Create observables for previous and next id
+  // prevId$ = this.id$.pipe(map(id => Math.max(id - 1, 1)));
+  // nextId$ = this.id$.pipe(map(id => id + 1));
+
+  // // Observable for fetching todo based on id
+  // todo$: Observable<Todo> = this.id$.pipe(
+  //   switchMap(id => this.todoService.getTodoById(id)) // Replace with actual service call
+  // );
+
+  // constructor(private todoService: TodoService) {}
+
+  // // Update id value
+  // setId(id: number): void {
+  //   this.id$.next(id); // Update the current id
+  // }
+
+  userId = input<number>(1); // InputSignal
+  // Data fetching with signals
+  // The resource function is used to create a resource that can be used to fetch data asynchronously.
+  // The resource function takes a request function and a loader function as arguments.
+  user = resource({
+    request: () => this.userId(),
+    loader: async ({ request: id }) =>{
+      const response = await this.bookService.getUser(id).toPromise();
+    return response;
+  }
+  });
+
+  id1 = signal(1);
+  swPersonResource = resource({
+    // request: () => `https://swapi.dev/api/people/${this.id1()}`,
+    request: () => this.id1(),
+    loader: async ({ request, abortSignal }) => {
+      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${request}`, {
+        signal: abortSignal,
+      });
+      if (!response.ok) throw new Error("Unable to load users!");
+      return (await response.json());
+  }
+  });
+  
+  form = signal({
+      first: "Pawel",
+      last: "K",
+    });
+
+// Initialize form state with data
+ initializeForm(data) {
+  this.form.set({ first: data.name, last: data.email });
+}
+
+submitData(){
+  console.log('Form data:', this.todo.value());
+}
+    quantity = signal(1);
+    qtyAvailable = signal([1, 2, 3, 4, 5, 6]);
+    selectedVehicle = signal<Vehicle>({
+      id: 1,
+      name: 'AT-AT',
+      price: 19416.13
+    });
+    vehicles = signal<Vehicle[]>([]);
+    totalPrice = computed(() => this.selectedVehicle().price * this.quantity());
+    color = computed(() => this.totalPrice() > 50000 ? 'green' : 'blue');
+
+    onQuantitySelected(qty: number) {
+      this.quantity.set(qty);
+    }
+
+
+
+  userData(){
+    console.log('user:', this.user.value(), this.swPersonResource.value());
   }
 
-  ngAfterViewInit(): void {
-   console.log(this);
-  }
-
-  Test() {
-    // Creating and reading a signal:
-    const count = signal(0);
+  count1: WritableSignal<number>;
+  currentUser;
+  count;
+  creatingReadingSignal() {
+    this.count = signal(0);
     // Signals are getter functions - calling them reads their value.
-    console.log('The count is: ' + count());
+    console.log('The count is: ' + this.count());
     // Setting or updating the value:
     // Setting a new signal value
-    count.set(3);
+    this.count.set(3);
     // Updating the existing value
     // Increment the count by 1.
-    count.update((value) => value + 1);
+    this.count.update((value) => value + 1);
     // Creating a computed signal:
-    const count1: WritableSignal<number> = signal(0);
-    const doubleCount: Signal<number> = computed(() => count1() * 2);
-    // Creating an effect:
-    effect(() => {
-      console.log(`The current count is: ${count1()}`);
-    });
+    this.count1  = signal(0);
+    const doubleCount: Signal<number> = computed(() => this.count1() * 2);
+
     // Utilizing an untracked:
-    const currentUser = signal('I am a user');
-    effect(() => {
-      console.log(
-        `User set to ${currentUser()} and the counter is ${untracked(count)}`
-      );
-    });
+    this.currentUser = signal('I am a user');
+
   }
 
   protected setName(name: WritableSignal<string>, event: Event) {
     name.set((event.target as HTMLInputElement).value || '');
   }
 
-  // effectVersion(){
-  //   id = injectParams('id');
 
-  //   idNumber = computed(() => Number(this.id()));
+   id = signal(2);
+   idNumber = computed(() => Number(this.id()));
+   // Use this to compute previous and next IDs
+   prevId$ = computed(() => Math.max(this.idNumber() - 1, 1))
+   nextId$ = computed(() => this.idNumber() + 1);
+ 
+   // Set a new ID value
+   setId(id: number): void {
+     this.id.set(id);
+   }
+  
+    // let id = signal(1); // injectParams('id');
 
-  //   todo = derivedAsync<Todo>(() =>
-  //     fetch(`https://jsonplaceholder.typicode.com/todos/${this.id()}`).then(
-  //       (response) => response.json()
-  //     )
-  //   );
+    // let idNumber = computed(() => Number(this.id()));
 
-  //   prevId = computed(() => Math.max(this.idNumber() - 1, 1));
-  //   nextId = computed(() => this.idNumber() + 1);
-  // }
+    // // there is no built-in concept called derivedAsync like in Solid.js or Svelte. However, you can achieve similar functionality by leveraging Angular's reactive programming features, such as RxJS observables and async pipe for handling asynchronous data.
+    // let todo = derivedAsync<Todo>(() =>
+    //   fetch(`https://jsonplaceholder.typicode.com/todos/${this.id()}`).then(
+    //     (response) => response.json()
+    //   )
+    // );
 
-  id() {}
-
-  idNumber() {
-    return 1;
-  }
+    // let prevId = computed(() => Math.max(this.idNumber() - 1, 1));
+    // let nextId = computed(() => this.idNumber() + 1);
 
   // ResolverVersion(){
   //   todo = injectRouteData<Todo>('data');
@@ -162,10 +217,6 @@ export class SignalsComponent {
   //   prevId = computed(() => Math.max(this.idNumber() - 1, 1));
   //   nextId = computed(() => this.idNumber() + 1);
   // }
-
-  todo() {
-    return { id: 2 };
-  }
 
   options = signal([
     'apple',
@@ -178,51 +229,28 @@ export class SignalsComponent {
     () => this.options()[0]
   );
 
+  
   setOption(option: string) {
     this.choice.set(option);
-    console.log('Option:', this.choice());
   }
 
-    // Data stored in signals
-    data = signal({
-      first: "Pawel",
-      last: "K",
-    });
-
-    // Form state derived from data
-    // form = signalForm(this.data);
-
-    quantity = signal(1);
-
-    qtyAvailable = signal([1, 2, 3, 4, 5, 6]);
-
-    selectedVehicle = signal<Vehicle>({
-      id: 1,
-      name: 'AT-AT',
-      price: 19416.13
-    });
-
-    vehicles = signal<Vehicle[]>([]);
-
-    onQuantitySelected(qty: number) {
-      this.quantity.set(qty);
-
-      this.quantity.set(5);
-      this.quantity.set(42);
-    }
-
-    totalPrice = computed(() => this.selectedVehicle().price * this.quantity());
-
-    color = computed(() => this.totalPrice() > 50000 ? 'green' : 'blue');
-
+  changeOption() {
+    this.options.set(['apple', 'banana', 'grape']);
+  }
  
+  siggy = signal(1);
+//   linky = linkedSignal({
+//   source: this.siggy,
+//   computation: (value, previous) => value * 2,
+// });
+linky = linkedSignal(() => this.siggy() * 2);
+
+// setting the new value, skiping the computation
+setSiggy(value: number) {
+this.siggy.set(value); 
 }
-export interface Todo {
-  userId: number;
-  id: number;
-  title: string;
-  completed: boolean;
 }
+
 
 export interface  Vehicle{
   id: number;
@@ -253,7 +281,7 @@ export class App {
 }
 
 
-// ou can think of a signal as a value plus a change notification. A signal is just a special type of variable that holds a value
+// You can think of a signal as a value plus a change notification. A signal is just a special type of variable that holds a value
 
 // Signals let us understand changes to the data model (what gets modified) and how the model is used (templates that need update).
 

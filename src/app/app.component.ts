@@ -42,4 +42,8 @@ export class AppComponent {
     // Fetch the routes from the router
     this.routes = this.router.config;
   }
+  showText = true;
+  showHideRouteBlock() {
+this.showText = !this.showText;
+  }
 }

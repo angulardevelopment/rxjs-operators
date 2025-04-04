@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { distinctUntilChanged, map } from 'rxjs';
+import { distinctUntilChanged, map, Observable } from 'rxjs';
 
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +21,10 @@ export class ApiService {
       )
       .subscribe((response) => this.#response.set(response));
   }
+
+  getTodoById(id: number): Observable<Todo> {
+    return this.#http.get<Todo>(`https://jsonplaceholder.typicode.com/todos/${id}`);
+  }
 }
 
 export const API_URL: string = 'https://dummyjson.com/users';
@@ -29,3 +33,10 @@ export type User = {
   firstName: string;
   lastName: string;
 };
+
+export interface Todo {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}

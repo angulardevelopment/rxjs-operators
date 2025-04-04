@@ -1,48 +1,87 @@
-<h1>Signal example</h1>
+<p>Creating and reading a signal</p>
+
 <div>
   <label>
     First name
     <input [value]="firstName()" (input)="setName(firstName, $event)" />
   </label>
-</div>
-<div>
   <label>
     Last name
     <input [value]="lastName()" (input)="setName(lastName, $event)" />
   </label>
+  <p>Full name (computed): {{ fullName() }}</p>
+  <p>Full name (observable): {{ fullNameStream | async }}</p>
 </div>
 
-<p>Full name (computed): {{ fullName() }}</p>
-<p>Full name (observable): {{ fullNameStream | async }}</p>
+<div>
+  <p>iterate the signals</p>
+  @for (book of books(); track book.id;) {
+  <p>title: {{ book.title }}</p>
+  }
+</div>
 
-@for (book of books(); track book.id;) {
-<p>{{ book.title }}</p>
-} 
+<div>
+  <p>style, iterate, set options</p>
+  <p>initial:{{ choice() }}</p>
+  @for (option of options(); track option;) {
+  <p   [ngStyle]="{'color':(option === 'fig' && choice() === 'fig') ? 'red' : ''}">{{ option }}</p>
+  }
 
-@for (book of options(); track book;) {
-  <p>{{ book }}</p>
-}
-<button (click)="setOption('fig')">set Option</button>
-<br/>
+  <button (click)="setOption('fig')">set Option fig</button>
+  <button (click)="changeOption()">change Option</button>
+  <button (click)="setOption('grape')">change Option grape</button>
+</div>
 
-@if (user.isLoading()) { Loading.... } @else {
-<!-- <user-profile [user]="user.value()" /> -->
-}
+<div>
+  <p>http Resource usage</p>
+  @if (user.isLoading()) { Loading.... } @else {
+  <!-- <user-profile [user]="user.value()" /> -->
+  <p>userId: {{ user.value().id }}</p>
+  <p>userName: {{ user.value().name }}</p>
+  }
+</div>
 
 <!-- <input [field]="form.fields.first">
      <input [field]="form.fields.last"> -->
 
-<select [ngModel]="quantity()" (change)="onQuantitySelected($any($event.target).value)">
-  <option *ngFor="let q of qtyAvailable()">{{ q }}</option>
-</select>
+<div>
+  <p>set, update, calculate quantities using signals</p>
+  <select
+    [ngModel]="quantity()"
+    (change)="onQuantitySelected($any($event.target).value)"
+    style="width: 10%"
+  >
+    <option *ngFor="let q of qtyAvailable()">{{ q }}</option>
+  </select>
+  <p>Vehicle: {{ selectedVehicle().name }}</p>
+  <p>Price: {{ selectedVehicle().price }}</p>
+  <p [style.color]="color()">Total: {{ totalPrice() }}</p>
+</div>
 
-<div>Vehicle: {{ selectedVehicle().name }}</div>
-<div>Price: {{ selectedVehicle().price }}</div>
-<div [style.color]="color()">Total: {{ totalPrice() }}</div>
+<div>
+  <p>fetch api with signals</p>
+  <input [value]="userId()" placeholder="userId" />
+  <button (click)="userData()">Resource API</button>
+  <pre> {{ swPersonResource.value() | json }}</pre>
+</div>
 
-userId:
-<input [value]="userId()"/>
-<button (click)="userData()">Fetch Resource value</button>
+<div>
+  <h2>Todo Details</h2>
+  <main *ngIf="todo.value(); else loading">
+    <p>{{ todo.value().title }}</p>
+    <p>{{ todo.value().completed ? "Completed" : "Not Completed" }}</p>
+  </main>
+  <ng-template #loading>
+    <p>Loading...</p>
+  </ng-template>
 
-swPersonResource
-<pre> {{swPersonResource.value()|json}}</pre>
+  <button (click)="setId(prevId$())">Previous</button>
+  <button (click)="setId(nextId$())">Next</button>
+</div>
+
+<div>
+  <p>linked signal usage</p>
+  {{ siggy() }}
+  {{ linky() }}
+  <button (click)="setSiggy(42)">set Siggy</button>
+</div>
