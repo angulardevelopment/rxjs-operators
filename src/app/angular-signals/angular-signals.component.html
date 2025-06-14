@@ -1,0 +1,17 @@
+<h1>Current value of the counter {{counter}}</h1>
+
+<button (click)="increment()">Increment</button>
+
+<h1>Current value of the counter {{counterWithSignal()}}</h1>
+  <h3>10x counter: {{derivedCounter()}}</h3>
+<button (click)="incrementWithSignal()">Increment</button>
+ <button (click)="multiplier = 10">
+    Set multiplier to 10
+  </button>
+   <h3>List value: {{list()}}</h3>
+
+  <h3>Object title: {{object().title}}</h3>
+  <h3>Object title: {{title()}}</h3>
+
+  <button (click)="updateObject()">Update</button>
+  Number: {{ num }}
