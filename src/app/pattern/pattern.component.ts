@@ -1,40 +1,38 @@
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, timer } from "rxjs";
-import { switchMap, tap } from "rxjs/operators";
-import { createCustomCommand } from "./custom-command/custom-command";
+import { BehaviorSubject, timer } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { createCustomCommand } from './custom-command/custom-command';
 
 @Component({
   selector: 'app-pattern',
   templateUrl: './pattern.component.html',
   styleUrls: ['./pattern.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class PatternComponent {
-
-  constructor() {
-  }
+  constructor() {}
 
   $disabled = new BehaviorSubject<boolean>(false);
 
   command = createCustomCommand(() =>
     timer(2000).pipe(
       tap(() => {
-        console.log("I have done executing");
-      })
-    )
+        console.log('I have done executing');
+      }),
+    ),
   );
 
   otherCommand = createCustomCommand<number>(
-    num$ =>
+    (num$) =>
       num$.pipe(
-        switchMap(num =>
+        switchMap((num) =>
           timer(2000).pipe(
             tap(() => {
-              console.log("I have done executing with param ", num);
-            })
-          )
-        )
+              console.log('I have done executing with param ', num);
+            }),
+          ),
+        ),
       ),
-    this.$disabled
+    this.$disabled,
   );
 }

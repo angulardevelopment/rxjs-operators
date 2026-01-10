@@ -1,5 +1,13 @@
-import { defer, isObservable, Observable, of, ReplaySubject, Subject, Subscription } from "rxjs";
-import { finalize, takeUntil, tap, withLatestFrom } from "rxjs/operators";
+import {
+  defer,
+  isObservable,
+  Observable,
+  of,
+  ReplaySubject,
+  Subject,
+  Subscription,
+} from 'rxjs';
+import { finalize, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
 
 export class CustomCommand<TExecute> {
   execute: Observable<TExecute>;
@@ -11,9 +19,10 @@ export class CustomCommand<TExecute> {
   private canExecuteSubscription: Subscription;
   private executeSubscription?: Subscription | null;
 
-
-  constructor(execute: Observable<TExecute>, canExecute: Observable<boolean> = of(true)) {
-
+  constructor(
+    execute: Observable<TExecute>,
+    canExecute: Observable<boolean> = of(true),
+  ) {
     this.execute = execute;
     this.canExecuteFromArgs = canExecute;
     this.initCanExecuteSubscription();
@@ -42,16 +51,18 @@ export class CustomCommand<TExecute> {
     this.nullifySubscription(this.canExecuteSubscription);
 
     this.$canExecute.next(false);
-    this.executeSubscription = this.execute.pipe(
-      tap(() => {
-        this.initCanExecuteSubscription();
-        this.$canExecute.next(true);
-      }),
-      finalize(() => {
-        this.initCanExecuteSubscription();
-        this.$canExecute.next(true);
-      })
-    ).subscribe();
+    this.executeSubscription = this.execute
+      .pipe(
+        tap(() => {
+          this.initCanExecuteSubscription();
+          this.$canExecute.next(true);
+        }),
+        finalize(() => {
+          this.initCanExecuteSubscription();
+          this.$canExecute.next(true);
+        }),
+      )
+      .subscribe();
   }
 
   unsubscribe() {
@@ -63,8 +74,9 @@ export class CustomCommand<TExecute> {
 
   private initCanExecuteSubscription() {
     this.nullifySubscription(this.canExecuteSubscription);
-    this.canExecuteSubscription = this.canExecuteFromArgs
-      .subscribe(this.$canExecute.next.bind(this.$canExecute));
+    this.canExecuteSubscription = this.canExecuteFromArgs.subscribe(
+      this.$canExecute.next.bind(this.$canExecute),
+    );
   }
 
   private nullifySubscription(subscription: Subscription) {
@@ -80,46 +92,46 @@ export class CustomCommand<TExecute> {
  */
 export function createCustomCommand<
   // This type quickly became part of effect 'API'
-    ProvidedType = void,
-    // The actual origin$ type, which could be unknown, when not specified
-    OriginType extends
-      | Observable<ProvidedType>
-      | unknown = Observable<ProvidedType>,
-    // Unwrapped actual type of the origin$ Observable, after default was applied
-    ObservableType = OriginType extends Observable<infer A> ? A : never,
-    ExecuteType = ProvidedType | ObservableType extends void
-      ? () => void
-      : (
-          observableOrValue: ObservableType | Observable<ObservableType>
-        ) => void,
-    // Return either an empty callback or a function requiring specific types as inputs
-    ReturnType = {
-      execute: ExecuteType,
-      canExecute$: Observable<boolean>,
-      unsubscribe: () => void
-    },
-        TExecute = unknown
+  ProvidedType = void,
+  // The actual origin$ type, which could be unknown, when not specified
+  OriginType extends Observable<ProvidedType> | unknown =
+    Observable<ProvidedType>,
+  // Unwrapped actual type of the origin$ Observable, after default was applied
+  ObservableType = OriginType extends Observable<infer A> ? A : never,
+  ExecuteType = ProvidedType | ObservableType extends void
+    ? () => void
+    : (observableOrValue: ObservableType | Observable<ObservableType>) => void,
+  // Return either an empty callback or a function requiring specific types as inputs
+  ReturnType = {
+    execute: ExecuteType;
+    canExecute$: Observable<boolean>;
+    unsubscribe: () => void;
+  },
+  TExecute = unknown,
 >(
   generator: (origin$: OriginType) => Observable<TExecute>,
   canExecute?: Observable<boolean>,
 ): ReturnType {
   const origin$ = new Subject<ObservableType>();
-  const command = new CustomCommand(generator(origin$ as OriginType), canExecute);
-  const execute = ((observableOrValue?: ObservableType | Observable<ObservableType>) => {
+  const command = new CustomCommand(
+    generator(origin$ as OriginType),
+    canExecute,
+  );
+  const execute = ((
+    observableOrValue?: ObservableType | Observable<ObservableType>,
+  ) => {
     command.invoke();
     const observable$ = isObservable(observableOrValue)
-        ? observableOrValue
-        : of(observableOrValue);
-    observable$
-      .pipe(takeUntil(command.unsubscribe$))
-      .subscribe(value => {
-        origin$.next(value);
-      })
-  }) as unknown as ExecuteType;;
+      ? observableOrValue
+      : of(observableOrValue);
+    observable$.pipe(takeUntil(command.unsubscribe$)).subscribe((value) => {
+      origin$.next(value);
+    });
+  }) as unknown as ExecuteType;
 
   return {
     execute,
     canExecute$: command.canExecute$,
-    unsubscribe: command.unsubscribe
+    unsubscribe: command.unsubscribe,
   } as unknown as ReturnType;
 }

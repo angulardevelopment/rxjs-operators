@@ -1,11 +1,11 @@
-import { ChangeDetectorRef, Directive } from "@angular/core";
-import { Subscription } from "rxjs";
-import { SmartStoreService } from "./smart-store.service";
+import { ChangeDetectorRef, Directive } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { SmartStoreService } from './smart-store.service';
 
 @Directive({
-  selector: "[appSmartStore]",
-  exportAs: "appSmartStore",
-  standalone: false
+  selector: '[appSmartStore]',
+  exportAs: 'appSmartStore',
+  standalone: false,
 })
 export class SmartStoreDirective {
   value: number;
@@ -13,7 +13,7 @@ export class SmartStoreDirective {
 
   constructor(
     private smartService: SmartStoreService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
   ) {}
 
   send(action) {
@@ -22,7 +22,7 @@ export class SmartStoreDirective {
 
   get data() {
     if (!this.subscription) {
-      this.subscription = this.smartService.data().subscribe(data => {
+      this.subscription = this.smartService.data().subscribe((data) => {
         this.value = data;
         this.cd.markForCheck();
       });

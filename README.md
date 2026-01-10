@@ -20,7 +20,7 @@ I'm Sam, and I'm passionate about product engineering and web development. I cre
 
 
 ### About the app
-Implemented basics rxjs operators, BehaviorSubject, Observables.
+Implemented basics rxjs operators, BehaviorSubject, Observables. signals reactive framework, signal based reactivity
 
 ## Subscribe and Stay Updated!
 

@@ -6,10 +6,9 @@ import { Subject } from 'rxjs';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class AppComponent {
-
   DEMO() {
     const mySubject = new Subject();
 
@@ -44,6 +43,6 @@ export class AppComponent {
   }
   showText = true;
   showHideRouteBlock() {
-this.showText = !this.showText;
+    this.showText = !this.showText;
   }
 }

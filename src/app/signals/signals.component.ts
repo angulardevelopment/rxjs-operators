@@ -1,5 +1,7 @@
 import {
   afterRenderEffect,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   computed,
   Directive,
@@ -16,17 +18,21 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { BookService } from '../services/book.service';
-import { z } from "zod";
-import { ApiService, Todo } from '../resource-api-demo/api.service';
+import { z } from 'zod';
+import { ApiService, Todo } from '../services/api.service';
 import { BehaviorSubject, from, map, Observable, switchMap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-signals',
   templateUrl: './signals.component.html',
   styleUrls: ['./signals.component.scss'],
-  standalone: false
+  standalone: false,
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
+
 export class SignalsComponent {
   constructor(public api: ApiService) {
     // only be used within an injection context such as a constructor
@@ -34,32 +40,85 @@ export class SignalsComponent {
       console.log(`${this.fullName()} updated`);
     });
 
-        // Creating an effect:
-        effect(() => {
-          console.log(`The current count is: ${this.count1()}`);
-        });
+    // Creating an effect:
+    effect(() => {
+      console.log(`The current count is: ${this.count1()}`);
+    });
 
-        effect(() => {
-          console.log(
-            `User set to ${this.currentUser()} and the counter is ${untracked(this.count)}`
-          );
-        });
+    effect(() => {
+      console.log(
+        `User set to ${this.currentUser()} and the counter is ${untracked(this.count)}`,
+      );
+    });
+
+     console.log(`counter value: ${this.counterWithSignal()}`);
+    this.list().push('Again');
+
+    this.object().title = 'overwriting title';
+
+    //The effect will be re-run whenever any
+    // of the signals that it uses changes value.
+    effect(() => {
+      // We just have to use the source signals
+      // somewhere inside this effect
+      const currentCount = this.counterWithSignal();
+
+      const derivedCounter = this.derivedCounter();
+
+      console.log(`current values: ${currentCount} 
+    ${derivedCounter}`);
+    });
+
+    const effectRef = effect(
+      () => {
+        console.log(`current value: ${this.count()}`);
+      },
+      {
+        manualCleanup: true,
+      },
+    );
+
+    // we can manually destroy the effect
+    // at any time
+    effectRef.destroy();
+
+    effect((onCleanup) => {
+      console.log(`current value: ${this.count()}`);
+
+      onCleanup(() => {
+        console.log('Perform cleanup action here');
+      });
+    });
+
+    // this works as expected
+    this.counterWithSignal.set(5);
+
+    // this throws a compilation error
+    // this.derivedCounter.set(50);
+
+    const readOnlyCounter = this.counterWithSignal.asReadonly();
+
+    // this throws a compilation error
+    // readOnlyCounter.set(5);
   }
 
   ngOnInit() {
-    this.creatingReadingSignal();
-    }
+   // setInterval(() => {
+    //   this.num = this.num + 1;
+    //   this.cdr.markForCheck();
+    // }, 1000);
+  }
 
-  protected readonly firstName = signal('first');     // Data stored in signals
+  protected readonly firstName = signal('first'); // Data stored in signals
   protected readonly lastName = signal('last');
   protected readonly fullName = computed(
-    () => `${this.firstName()} ${this.lastName()}`
+    () => `${this.firstName()} ${this.lastName()}`,
   );
   protected readonly fullNameStream = toObservable(this.fullName);
   readonly bookService = inject(BookService);
   readonly books = toSignal(this.bookService.getAll());
 
-    // user = httpResource(() =>
+  // user = httpResource(() =>
   //  `/data/user/${this.userIdid()}`
   // );
 
@@ -70,15 +129,15 @@ export class SignalsComponent {
   //       'X-Page': this.page(),
   //   }
   // }));
-  todo = 
-  resource({
-    request: () => this.id(), // Request function to get the ID
-    loader: async ({ request: id }) => {
-      const response: Todo = await this.api.getTodoById(id).toPromise(); // Fetch todo based on the ID
-      return response;
-    }
-    });
-  
+  // todo =
+  // resource({
+  //   request: () => this.id(), // Request function to get the ID
+  //   loader: async ({ request: id }) => {
+  //     const response: Todo = await this.api.getTodoById(id).toPromise(); // Fetch todo based on the ID
+  //     return response;
+  //   }
+  //   });
+
   // Define id as a BehaviorSubject (RxJS way of handling state)
   // id$ = new BehaviorSubject<number>(1);
 
@@ -102,64 +161,47 @@ export class SignalsComponent {
   // Data fetching with signals
   // The resource function is used to create a resource that can be used to fetch data asynchronously.
   // The resource function takes a request function and a loader function as arguments.
-  user = resource({
-    request: () => this.userId(),
-    loader: async ({ request: id }) =>{
-      const response = await this.bookService.getUser(id).toPromise();
-    return response;
-  }
-  });
+  // user = resource({
+  //   request: () => this.userId(),
+  //   loader: async ({ request: id }) =>{
+  //     const response = await this.bookService.getUser(id).toPromise();
+  //   return response;
+  // }
+  // });
 
   id1 = signal(1);
-  swPersonResource = resource({
-    // request: () => `https://swapi.dev/api/people/${this.id1()}`,
-    request: () => this.id1(),
-    loader: async ({ request, abortSignal }) => {
-      const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${request}`, {
-        signal: abortSignal,
-      });
-      if (!response.ok) throw new Error("Unable to load users!");
-      return (await response.json());
-  }
-  });
-  
+  // swPersonResource = resource({
+  //   // request: () => `https://swapi.dev/api/people/${this.id1()}`,
+  //   request: () => this.id1(),
+  //   loader: async ({ request, abortSignal }) => {
+  //     const response = await fetch(`https://jsonplaceholder.typicode.com/posts/${request}`, {
+  //       signal: abortSignal,
+  //     });
+  //     if (!response.ok) throw new Error("Unable to load users!");
+  //     return (await response.json());
+  // }
+  // });
+
   form = signal({
-      first: "Pawel",
-      last: "K",
-    });
+    first: 'Pawel',
+    last: 'K',
+  });
 
-// Initialize form state with data
- initializeForm(data) {
-  this.form.set({ first: data.name, last: data.email });
-}
+  quantity = signal(1);
+  qtyAvailable = signal([1, 2, 3, 4, 5, 6]);
+  selectedVehicle = signal<Vehicle>({
+    id: 1,
+    name: 'AT-AT',
+    price: 19416.13,
+  });
+  vehicles = signal<Vehicle[]>([]);
+  totalPrice = computed(() => this.selectedVehicle().price * this.quantity());
+  color = computed(() => (this.totalPrice() > 50000 ? 'green' : 'blue'));
 
-submitData(){
-  console.log('Form data:', this.todo.value());
-}
-    quantity = signal(1);
-    qtyAvailable = signal([1, 2, 3, 4, 5, 6]);
-    selectedVehicle = signal<Vehicle>({
-      id: 1,
-      name: 'AT-AT',
-      price: 19416.13
-    });
-    vehicles = signal<Vehicle[]>([]);
-    totalPrice = computed(() => this.selectedVehicle().price * this.quantity());
-    color = computed(() => this.totalPrice() > 50000 ? 'green' : 'blue');
-
-    onQuantitySelected(qty: number) {
-      this.quantity.set(qty);
-    }
-
-
-
-  userData(){
-    console.log('user:', this.user.value(), this.swPersonResource.value());
+  onQuantitySelected(qty: number) {
+    this.quantity.set(qty);
   }
 
-  count1: WritableSignal<number>;
-  currentUser;
-  count;
   creatingReadingSignal() {
     this.count = signal(0);
     // Signals are getter functions - calling them reads their value.
@@ -171,43 +213,37 @@ submitData(){
     // Increment the count by 1.
     this.count.update((value) => value + 1);
     // Creating a computed signal:
-    this.count1  = signal(0);
+    this.count1 = signal(0);
     const doubleCount: Signal<number> = computed(() => this.count1() * 2);
 
     // Utilizing an untracked:
     this.currentUser = signal('I am a user');
-
+  // Initialize form state with data
+        this.form.set({ first: 'name', last: 'email' });
   }
 
   protected setName(name: WritableSignal<string>, event: Event) {
     name.set((event.target as HTMLInputElement).value || '');
   }
 
+  // Set a new ID value
+  setId(id: number): void {
+    this.id.set(id);
+  }
 
-   id = signal(2);
-   idNumber = computed(() => Number(this.id()));
-   // Use this to compute previous and next IDs
-   prevId$ = computed(() => Math.max(this.idNumber() - 1, 1))
-   nextId$ = computed(() => this.idNumber() + 1);
- 
-   // Set a new ID value
-   setId(id: number): void {
-     this.id.set(id);
-   }
-  
-    // let id = signal(1); // injectParams('id');
+  // let id = signal(1); // injectParams('id');
 
-    // let idNumber = computed(() => Number(this.id()));
+  // let idNumber = computed(() => Number(this.id()));
 
-    // // there is no built-in concept called derivedAsync like in Solid.js or Svelte. However, you can achieve similar functionality by leveraging Angular's reactive programming features, such as RxJS observables and async pipe for handling asynchronous data.
-    // let todo = derivedAsync<Todo>(() =>
-    //   fetch(`https://jsonplaceholder.typicode.com/todos/${this.id()}`).then(
-    //     (response) => response.json()
-    //   )
-    // );
+  // // there is no built-in concept called derivedAsync like in Solid.js or Svelte. However, you can achieve similar functionality by leveraging Angular's reactive programming features, such as RxJS observables and async pipe for handling asynchronous data.
+  // let todo = derivedAsync<Todo>(() =>
+  //   fetch(`https://jsonplaceholder.typicode.com/todos/${this.id()}`).then(
+  //     (response) => response.json()
+  //   )
+  // );
 
-    // let prevId = computed(() => Math.max(this.idNumber() - 1, 1));
-    // let nextId = computed(() => this.idNumber() + 1);
+  // let prevId = computed(() => Math.max(this.idNumber() - 1, 1));
+  // let nextId = computed(() => this.idNumber() + 1);
 
   // ResolverVersion(){
   //   todo = injectRouteData<Todo>('data');
@@ -218,18 +254,24 @@ submitData(){
   //   nextId = computed(() => this.idNumber() + 1);
   // }
 
-  options = signal([
-    'apple',
-    'banana',
-    'fig'
-  ]);
+  options = signal(['apple', 'banana', 'fig']);
 
   // linkedSignal works similarly to signal with one key difference— instead of passing a default value, you pass a computation function, just like computed. When the value of the computation changes, the value of the linkedSignal changes to the computation result. This is useful when you want to create a signal that depends on another signal.
-  choice = linkedSignal(
-    () => this.options()[0]
-  );
+  choice = linkedSignal(() => this.options()[0]);
+  id = signal(2);
+  idNumber = computed(() => Number(this.id()));
+  // Use this to compute previous and next IDs
+  prevId$ = computed(() => Math.max(this.idNumber() - 1, 1));
+  nextId$ = computed(() => this.idNumber() + 1);
+  count1: WritableSignal<number>;
+  currentUser;
+  siggy = signal(1);
+  //   linky = linkedSignal({
+  //   source: this.siggy,
+  //   computation: (value, previous) => value * 2,
+  // });
+  linky = linkedSignal(() => this.siggy() * 2);
 
-  
   setOption(option: string) {
     this.choice.set(option);
   }
@@ -237,35 +279,148 @@ submitData(){
   changeOption() {
     this.options.set(['apple', 'banana', 'grape']);
   }
- 
-  siggy = signal(1);
-//   linky = linkedSignal({
-//   source: this.siggy,
-//   computation: (value, previous) => value * 2,
-// });
-linky = linkedSignal(() => this.siggy() * 2);
 
-// setting the new value, skiping the computation
-setSiggy(value: number) {
-this.siggy.set(value); 
+  // setting the new value, skiping the computation
+  setSiggy(value: number) {
+    this.siggy.set(value);
+  }
+
+   counter: number = 0;
+  count = signal(0);
+
+  increment() {
+    this.counter++;
+  }
+
+  counterWithSignal = signal(0);
+
+  incrementWithSignal() {
+    console.log(`Updating counter...`);
+
+    this.counterWithSignal.set(this.counterWithSignal() + 1);
+    // this.counter.update(counter => counter + 1);
+  }
+
+  //  derivedCounter = computed(() => {
+
+  //       return this.counterWithSignal() * 10;
+
+  //   })
+
+  //  derivedCounter = computed(() => {
+
+  //     return untracked(this.counterWithSignal) * 10;
+
+  // })
+
+  multiplier: number = 0;
+
+  derivedCounter = computed(() => {
+    if (this.counterWithSignal() == 0) {
+      return 0;
+    } else {
+      return this.counterWithSignal() * this.multiplier;
+    }
+  });
+
+  list = signal(['Hello', 'World']);
+
+  object = signal(
+    {
+      id: 1,
+      title: 'Angular For Beginners',
+    },
+    {
+      equal: (a, b) => {
+        return a.id === b.id && a.title == b.title;
+      },
+    },
+  );
+
+  title = computed(() => {
+    console.log(`Calling computed() function...`);
+
+    const course = this.object();
+
+    return course.title;
+  });
+
+  updateObject() {
+    // We are setting the signal with the exact same
+    // object to see if the derived title signal will
+    // be recalculated or not
+    this.object.set({
+      id: 1,
+      title: 'Angular For Beginners',
+    });
+  }
+
+  num = 1;
+
+  private cdr = inject(ChangeDetectorRef);
+ #http = inject(HttpClient);
+  #apiService = inject(ApiService);
+
+  apiUsers = this.#apiService.users;
+
+  // Set it to undefined to postpone the API call to when the query has a value
+  query = signal<string | undefined>(undefined);
+
+  // users = resource<User[], string | undefined>({
+  //   request: () => this.query(),
+  //   loader: async ({ request, abortSignal }) => {
+  //     const users = await fetch(`${API_URL}/search?q=${request}`, {
+  //       signal: abortSignal,
+  //     });
+
+  //     if (!users.ok) throw Error('Unable to load!');
+  //     return (await users.json()).users;
+  //   },
+  // });
+
+  // rxUsers = rxResource<User[], string | undefined>({
+  //   request: () => this.query(),
+  //   loader: ({ request }) =>
+  //     this.#http.get<{ users: User[] }>(`${API_URL}/search?q=${request}`).pipe(
+  //       distinctUntilChanged(),
+  //       map(({ users }) => users),
+  //       catchError(() => {
+  //         throw Error('Unable to load!');
+  //       })
+  //     ),
+  // });
+
+  search(event: Event) {
+    const { value } = event.target as HTMLInputElement;
+    this.query.set(value);
+
+    this.#apiService.doApiCall(value);
+  }
+
+  load() {
+    this.query.set('');
+    this.#apiService.doApiCall();
+  }
+
+  reload() {
+    // this.users.reload();
+    // this.rxUsers.reload();
+  }
+
 }
-}
 
-
-export interface  Vehicle{
+export interface Vehicle {
   id: number;
-  name: string,
-  price: number
+  name: string;
+  price: number;
 }
 @Directive()
 export class UserProfile {
   first = input<string>();
-  last  = input.required<string>();
+  last = input.required<string>();
 
   fullName = computed(() =>
-    this.first() ?
-      `${this.first()} ${this.last()}`:
-      this.last()
+    this.first() ? `${this.first()} ${this.last()}` : this.last(),
   );
 }
 
@@ -275,11 +430,10 @@ export class App {
 
   constructor() {
     afterRenderEffect(() => {
- this.firstItem()?.nativeElement.focus();
+      this.firstItem()?.nativeElement.focus();
     });
   }
 }
-
 
 // You can think of a signal as a value plus a change notification. A signal is just a special type of variable that holds a value
 
@@ -367,13 +521,11 @@ export class App {
 // Testing story is here as well
 // Simplified API , More advanced API version
 
-
-
-  // Zod Schema
-  export const starWarsPersonSchema = z.object({
-    name: z.string(),
-    height: z.number({ coerce: true }),
-    edited: z.string().datetime(),
-    films: z.array(z.string()),
-    title: z.string(),
-    })
+// Zod Schema
+export const starWarsPersonSchema = z.object({
+  name: z.string(),
+  height: z.number(), // { coerce: true }
+  edited: z.string().datetime(),
+  films: z.array(z.string()),
+  title: z.string(),
+});

@@ -15,6 +15,9 @@
   Toggle disabled state for Other Button
 </button>
 <br />
-<button (click)="otherCommand$.next(123)" [disabled]="(otherCommandDisabled$ | async)">
+<button
+  (click)="otherCommand$.next(123)"
+  [disabled]="otherCommandDisabled$ | async"
+>
   Other Button
 </button>

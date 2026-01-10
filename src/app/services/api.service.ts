@@ -2,7 +2,6 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { distinctUntilChanged, map, Observable } from 'rxjs';
 
-
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   #http = inject(HttpClient);
@@ -17,13 +16,15 @@ export class ApiService {
       .get<{ users: User[] }>(`${API_URL}/search?q=${request}`)
       .pipe(
         distinctUntilChanged(),
-        map(({ users }) => users)
+        map(({ users }) => users),
       )
       .subscribe((response) => this.#response.set(response));
   }
 
   getTodoById(id: number): Observable<Todo> {
-    return this.#http.get<Todo>(`https://jsonplaceholder.typicode.com/todos/${id}`);
+    return this.#http.get<Todo>(
+      `https://jsonplaceholder.typicode.com/todos/${id}`,
+    );
   }
 }
 

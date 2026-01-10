@@ -1,50 +1,109 @@
-<p>test works!</p>
-<button #saveButton>saveButton</button>
+<pre>
+Understand Observables: of, from, interval, pipe
+Learn key operators: map, mergeMap, switchMap, debounceTime, catchError
+Practice Subjects: Subject, BehaviorSubject, ReplaySubject
+Build use cases: search-as-you-type, polling, retry logic, error handling, Async requests, event handling, state management.
+</pre>
 <ul>
-  <li>tap op</li>
-  <li>combineLatest op</li>
-  <li>catchError op</li>
-  <li>customOperator</li>
+  <li (click)="tapUsage()">tap - used to perform side effects within an observable pipeline without modifying the emitted values or affecting the stream's flow</li>
+  <li (click)="combineLatestUsage()">combineLatest - combines the latest values from multiple observables and emits them as an array whenever any of the observables emit a new value.</li>
+  <li (click)="catchErrorUsage()">catchError op</li>
+  <li (click)="customOperator()">create your own Operator</li>
+  <li (click)="closureCustomOperator()">closureCustomOperator</li>
+  <li (click)="mapOperator()">map- transforms the items emitted by an Observable by applying a function to each item.</li>
+  <li (click)="flattening()">flattening operators</li>
+  <li (click)="mergeMapFlattening()">mergeMap - It is a combination of Observable merge and map. There are times when your map or projection will generate multiple Observables. For example, now I have an array of characters, and for each character, I would like to make a backend call and get some information. With this, you will not get data in sequence.</li>
+  <li (click)="switchMapFlattening()">switchMap - it cancels the request immediately and emits the latest values.</li>
+  <li (click)="concatMapFlattening()">concatMap - higher-order mapping operator used to map values from a source observable into "inner" observables, and then flatten them into a single output observable sequentially. get the data in sequence.</li>
+  <li (click)="exhaustMapFlattening()">exhaustMap- it ignores any new source values until the current inner Observable completes, preventing concurrent operations</li>
+  <li (click)="delayTap()">delayTap</li>
+  <li (click)="ofAndFrom()">of And From</li>
+  <li (click)="debounceTimeUsage()">debounceTime</li>
+  <li (click)="withPromise()">withpromise</li>
+  <li (click)="withForkJoin()">withforkjoin - combine the last values emitted by multiple Observables once all of them have completed. It's similar to Promise.all() but for Observables. </li>
+  <li (click)="subjectEg()">SubjectEg</li>
+  <li (click)="observableHandle()">Observable</li>
+  <li (click)="timerRelated()">Timer Related</li>
+  <li (click)="fromEventOperator()">fromEvent Operator - used to creating an observable from an event-emitting DOM element</li>
+  <li (click)="firstValueFromAndTake()">firstValueFrom and take</li>
+  <li (click)="mergeOperator()">merge Operator - combines multiple observables into one by merging their emissions</li>
+  <li (click)="retryOperator()">retry Operator - retries a failed observable a specified number of times before throwing an error</li>
+  <li (click)="takeUntilExample()">takeUntilExample</li>
+  <li (click)="intervalUsage()">intervalUsage</li>
+  <li (click)="pipeUsage()">pipeUsage</li>
+  <li (click)="behaviorSubjectEg()">behaviorSubjectEg</li>
+  <li (click)="replaySubjectUsage()">replaySubjectUsage</li>
 </ul>
 
-<h1>Hello from {{ name }}!</h1>
-<a target="_blank" href="https://angular.dev/overview">
-  Learn more about Angular
-</a>
-<div class="timer" *ngIf="(timeLeft$ | async) as t;">
-  <h4> Count down timer </h4>
-  <span id="hours"> {{t.hoursToDday}} </span>Hrs
-  <span id="minutes"> {{t.minutesToDday}} </span>Min
-  <span id="seconds"> {{t.secondsToDday}} </span>S
+
+<p>Timer Related</p>
+<div class="timer" *ngIf="timeLeft$ | async as t">
+  <h4>Count down timer</h4>
+  <span id="hours"> {{ t.hoursToDday }} </span>Hrs
+  <span id="minutes"> {{ t.minutesToDday }} </span>Min
+  <span id="seconds"> {{ t.secondsToDday }} </span>S
 </div>
+
 <ul>
   <ng-template ngFor let-hero [ngForOf]="heroes">
-    <li>{{hero.name}}
-  </ng-template>
+    <li>{{ hero.name }}</li></ng-template
+  >
 </ul>
 
-
-<input placeholder="Search" #input list="dynmicUserIds">
+<input placeholder="serverSide Search" #serverSideSearchInput list="dynmicUserIds" />
 
 <datalist id="dynmicUserIds">
-  <option *ngFor="let item of temp" [value]="item.cCourse">{{item.cCourse}}</option>
+  <option *ngFor="let item of temp" [value]="item.cCourse">
+    {{ item.cCourse }}
+  </option>
 </datalist>
 
-<p>smart store component</p>
-<div>
-  <!-- <app-smart></app-smart> -->
-</div>
 
-<span>coming in {{asyncExample | async}} seconds!</span>
+<span>coming in {{ asyncExample | async }} seconds!</span>
 <!-- *ngIf="(asyncExample | async) as user" [user]="user" -->
 
-
-<ng-container *ngIf="bitcoinPrice$ | async as price; else loadingOrError">
-  <!-- <p>Bitcoin Price: {{ price | currency }}</p> -->
+<p>switchMap</p>
+<!-- <ng-container *ngIf="bitcoinPrice$ | async as price; else loadingOrError">
+  <p>Bitcoin Price: {{ price | currency }}</p>
   <p>Bitcoin Price: {{ price | json }}</p>
-
 </ng-container>
 <ng-template #loadingOrError>
   <p *ngIf="priceError">{{ priceError }}</p>
   <p *ngIf="!priceError">Price is loading ...</p>
-</ng-template>
+</ng-template> -->
+
+<p>exhaustMap</p>
+<button #saveButton>saveButton</button>
+
+<input [(ngModel)]="search" (ngModelChange)="updateSearch($event)" />
+<p>switchMap</p>
+{{ switch$ | async }}
+<hr />
+<p>concatMap</p>
+{{ concat$ | async }}
+<hr />
+<p>mergeMap</p>
+{{ merge$ | async }}
+<hr />
+
+<p>takeUntilDestroyed</p>
+count: {{ count }}
+
+<input #searchBox type="text" placeholder="Type to search..." />
+
+
+ <ul>
+      <li *ngFor="let item of items | async">
+        {{ item }}
+      </li>
+    </ul>
+
+      <button (click)="incrementCounter()">
+      Up Vote
+    </button>
+
+     <div class="p-4">
+      <h2 class="text-xl font-semibold">Search</h2>
+      <input [formControl]="searchControl" placeholder="Search..." class="p-2 border rounded" />
+      <p>Search Term: {{ searchTerm }}</p>
+    </div>

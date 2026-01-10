@@ -3,22 +3,22 @@ import {
   EventEmitter,
   Input,
   ChangeDetectionStrategy,
-  Output
-} from "@angular/core";
+  Output,
+} from '@angular/core';
 
 @Component({
-  selector: "app-dumb3",
-  templateUrl: "./dumb3.component.html",
+  selector: 'app-dumb3',
+  templateUrl: './dumb3.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: false
+  standalone: false,
 })
 export class Dumb3Component {
   @Input() counter = 0;
   @Output() send: EventEmitter<string> = new EventEmitter<string>();
   onAdd() {
-    this.send.emit("ADD");
+    this.send.emit('ADD');
   }
   onSub() {
-    this.send.emit("SUB");
+    this.send.emit('SUB');
   }
 }

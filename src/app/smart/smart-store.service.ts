@@ -1,5 +1,5 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Subject, Observable } from "rxjs";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Subject, Observable } from 'rxjs';
 
 @Injectable()
 export class SmartStoreService {
@@ -12,16 +12,16 @@ export class SmartStoreService {
 
     console.log(`Action ${action} with payload ${payload}`);
     switch (action) {
-      case "ADD":
+      case 'ADD':
         this.valueSubject.next(++this.value);
         break;
-      case "SUB":
+      case 'SUB':
         this.valueSubject.next(--this.value);
         break;
-      case "RESET":
+      case 'RESET':
         this.valueSubject.next((this.value = 0));
         break;
-      case "SET":
+      case 'SET':
         this.value = payload;
         this.valueSubject.next(payload);
         break;

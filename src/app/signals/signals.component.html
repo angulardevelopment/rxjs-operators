@@ -1,5 +1,7 @@
 <p>Creating and reading a signal</p>
-
+<ul>
+  <li (click)="creatingReadingSignal()">Basic signals</li>
+</ul>
 <div>
   <label>
     First name
@@ -15,16 +17,20 @@
 
 <div>
   <p>iterate the signals</p>
-  @for (book of books(); track book.id;) {
-  <p>title: {{ book.title }}</p>
+  @for (book of books(); track book.id) {
+    <p>title: {{ book.title }}</p>
   }
 </div>
 
 <div>
   <p>style, iterate, set options</p>
   <p>initial:{{ choice() }}</p>
-  @for (option of options(); track option;) {
-  <p   [ngStyle]="{'color':(option === 'fig' && choice() === 'fig') ? 'red' : ''}">{{ option }}</p>
+  @for (option of options(); track option) {
+    <p
+      [ngStyle]="{ color: option === 'fig' && choice() === 'fig' ? 'red' : '' }"
+    >
+      {{ option }}
+    </p>
   }
 
   <button (click)="setOption('fig')">set Option fig</button>
@@ -32,14 +38,15 @@
   <button (click)="setOption('grape')">change Option grape</button>
 </div>
 
-<div>
+<!-- <div>
   <p>http Resource usage</p>
-  @if (user.isLoading()) { Loading.... } @else {
-  <!-- <user-profile [user]="user.value()" /> -->
-  <p>userId: {{ user.value().id }}</p>
-  <p>userName: {{ user.value().name }}</p>
+  @if (user.isLoading()) {
+    Loading....
+  } @else {
+    <p>userId: {{ user.value().id }}</p>
+    <p>userName: {{ user.value().name }}</p>
   }
-</div>
+</div> -->
 
 <!-- <input [field]="form.fields.first">
      <input [field]="form.fields.last"> -->
@@ -61,16 +68,16 @@
 <div>
   <p>fetch api with signals</p>
   <input [value]="userId()" placeholder="userId" />
-  <button (click)="userData()">Resource API</button>
-  <pre> {{ swPersonResource.value() | json }}</pre>
+
+  <!-- <pre> {{ swPersonResource.value() | json }}</pre> -->
 </div>
 
 <div>
   <h2>Todo Details</h2>
-  <main *ngIf="todo.value(); else loading">
+  <!-- <main *ngIf="todo.value(); else loading">
     <p>{{ todo.value().title }}</p>
     <p>{{ todo.value().completed ? "Completed" : "Not Completed" }}</p>
-  </main>
+  </main> -->
   <ng-template #loading>
     <p>Loading...</p>
   </ng-template>
@@ -85,3 +92,82 @@
   {{ linky() }}
   <button (click)="setSiggy(42)">set Siggy</button>
 </div>
+
+<h1>Current value of the counter {{ counter }}</h1>
+
+<button (click)="increment()">Increment</button>
+
+<h1>Current value of the counter {{ counterWithSignal() }}</h1>
+<h3>10x counter: {{ derivedCounter() }}</h3>
+<button (click)="incrementWithSignal()">Increment</button>
+<button (click)="multiplier = 10">Set multiplier to 10</button>
+<h3>List value: {{ list() }}</h3>
+
+<h3>Object title: {{ object().title }}</h3>
+<h3>Object title: {{ title() }}</h3>
+
+<button (click)="updateObject()">Update</button>
+Number: {{ num }}
+
+<input (input)="search($event)" placeholder="Type to search user..." />
+
+<br />
+<br />
+
+<button (click)="load()">Load</button>
+
+<br />
+<br />
+
+<button (click)="reload()">Reload</button>
+
+<br />
+
+<h2>api service</h2>
+<ul>
+  @for (user of apiUsers(); track user.id) {
+    <li>{{ user.firstName }}{{ user.lastName }}</li>
+  } @empty {
+    <p>No Users!</p>
+  }
+</ul>
+
+<br />
+
+<h2>resource</h2>
+<!-- <ul>
+  @let error = users.error();
+  @if (error) {
+    <p>{{ error }}</p>
+  }
+
+  @if (users.isLoading()) {
+    <p>Loading Users...</p>
+  }
+
+  @for (user of users.value(); track user.id) {
+    <li>{{ user.firstName }}{{ user.lastName }}</li>
+  } @empty {
+    <p>No Users!</p>
+  }
+</ul> -->
+
+<br />
+
+<h2>rxResource</h2>
+<!-- <ul>
+  @let rxError = rxUsers.error();
+  @if (rxError) {
+    <p>{{ rxError }}</p>
+  }
+
+  @if (rxUsers.isLoading()) {
+    <p>Loading Users...</p>
+  }
+
+  @for (rxUser of rxUsers.value(); track rxUser.id) {
+    <li>{{ rxUser.firstName }}{{ rxUser.lastName }}</li>
+  } @empty {
+    <p>No Users!</p>
+  }
+</ul> -->

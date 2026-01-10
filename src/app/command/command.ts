@@ -4,9 +4,9 @@ import {
   of,
   ReplaySubject,
   Subject,
-  Subscription
-} from "rxjs";
-import { finalize, takeUntil, tap } from "rxjs/operators";
+  Subscription,
+} from 'rxjs';
+import { finalize, takeUntil, tap } from 'rxjs/operators';
 
 export class CustomCommand<TExecute> {
   execute: Observable<TExecute>;
@@ -19,11 +19,11 @@ export class CustomCommand<TExecute> {
 
   constructor(
     execute: Observable<TExecute>,
-    canExecute: Observable<boolean> = of(true)
+    canExecute: Observable<boolean> = of(true),
   ) {
     this.execute = execute;
     this.canExecuteSubscription = canExecute.subscribe(
-      this.$canExecute.next.bind(this.$canExecute)
+      this.$canExecute.next.bind(this.$canExecute),
     );
   }
 
@@ -45,7 +45,7 @@ export class CustomCommand<TExecute> {
     this.executeSubscription = this.execute
       .pipe(
         tap(() => this.$canExecute.next(true)),
-        finalize(() => this.$canExecute.next(true))
+        finalize(() => this.$canExecute.next(true)),
       )
       .subscribe();
   }
@@ -62,9 +62,8 @@ export function createCustomCommand<
   // This type quickly became part of effect 'API'
   ProvidedType = void,
   // The actual origin$ type, which could be unknown, when not specified
-  OriginType extends Observable<ProvidedType> | unknown = Observable<
-    ProvidedType
-  >,
+  OriginType extends Observable<ProvidedType> | unknown =
+    Observable<ProvidedType>,
   // Unwrapped actual type of the origin$ Observable, after default was applied
   ObservableType = OriginType extends Observable<infer A> ? A : never,
   ExecuteType = ProvidedType | ObservableType extends void
@@ -76,18 +75,18 @@ export function createCustomCommand<
     canExecute$: Observable<boolean>;
     unsubscribe: () => void;
   },
-  TExecute = unknown
+  TExecute = unknown,
 >(
   generator: (origin$: OriginType) => Observable<TExecute>,
-  canExecute?: Observable<boolean>
+  canExecute?: Observable<boolean>,
 ): ReturnType {
   const origin$ = new Subject<ObservableType>();
   const command = new CustomCommand(
     generator(origin$ as OriginType),
-    canExecute
+    canExecute,
   );
-  const execute = (((
-    observableOrValue?: ObservableType | Observable<ObservableType>
+  const execute = ((
+    observableOrValue?: ObservableType | Observable<ObservableType>,
   ) => {
     command.invoke();
     const observable$ = isObservable(observableOrValue)
@@ -96,11 +95,11 @@ export function createCustomCommand<
     observable$.pipe(takeUntil(command.unsubscribe$)).subscribe((value) => {
       origin$.next(value);
     });
-  }) as unknown) as ExecuteType;
+  }) as unknown as ExecuteType;
 
-  return ({
+  return {
     execute,
     canExecute$: command.canExecute$,
-    unsubscribe: command.unsubscribe
-  } as unknown) as ReturnType;
+    unsubscribe: command.unsubscribe,
+  } as unknown as ReturnType;
 }

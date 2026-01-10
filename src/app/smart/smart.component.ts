@@ -1,12 +1,12 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
-import { SmartStoreService } from "./smart-store.service";
+import { Component, Input, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { SmartStoreService } from './smart-store.service';
 
 @Component({
-  selector: "app-smart",
-  templateUrl: "./smart.component.html",
+  selector: 'app-smart',
+  templateUrl: './smart.component.html',
   providers: [SmartStoreService],
-  standalone: false
+  standalone: false,
 })
 export class SmartComponent implements OnInit {
   @Input() user;
@@ -23,20 +23,16 @@ export class SmartComponent implements OnInit {
   }
 
   set(value: number) {
-    this.smartService.send("SET", value);
+    this.smartService.send('SET', value);
   }
 
   ngOnInit() {}
-
-
 }
 
 @Component({
-  selector: "app-smart-state",
-  template: `
-    <ng-content></ng-content>
-  `,
-  standalone: false
+  selector: 'app-smart-state',
+  template: ` <ng-content></ng-content> `,
+  standalone: false,
 })
 export class SmartStateComponent {
   constructor(public smartComponent: SmartComponent) {}

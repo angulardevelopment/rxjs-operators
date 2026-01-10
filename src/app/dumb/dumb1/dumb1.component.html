@@ -1,11 +1,16 @@
 <div>
   <h2>Dumb 1.1 [Or Smart ?]</h2>
 
-
-  <h3> Using Component </h3>
+  <h3>Using Component</h3>
   <app-smart-store #smartStore>
-    <app-dumb2 [counter]="smartStore.data" (send)="smartStore.send($event)"></app-dumb2>
-    <app-dumb3 [counter]="smartStore.data" (send)="smartStore.send($event)"></app-dumb3>
+    <app-dumb2
+      [counter]="smartStore.data"
+      (send)="smartStore.send($event)"
+    ></app-dumb2>
+    <app-dumb3
+      [counter]="smartStore.data"
+      (send)="smartStore.send($event)"
+    ></app-dumb3>
   </app-smart-store>
 
   <!-- <h3> Using Directive </h3>

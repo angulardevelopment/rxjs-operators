@@ -1,5 +1,5 @@
-import { Component, OnInit, VERSION } from "@angular/core";
-import { BehaviorSubject, Subject, TimeoutError, timer } from "rxjs";
+import { Component, OnInit, VERSION } from '@angular/core';
+import { BehaviorSubject, Subject, TimeoutError, timer } from 'rxjs';
 import {
   delay,
   filter,
@@ -8,17 +8,17 @@ import {
   mergeMap,
   switchMap,
   takeUntil,
-  tap
-} from "rxjs/operators";
+  tap,
+} from 'rxjs/operators';
 
 @Component({
-  selector: "app-command",
-  templateUrl: "./command.component.html",
-  styleUrls: ["./command.component.css"],
-  standalone: false
+  selector: 'app-command',
+  templateUrl: './command.component.html',
+  styleUrls: ['./command.component.css'],
+  standalone: false,
 })
 export class CommandComponent implements OnInit {
-  public readonly name = "Angular " + VERSION.major;
+  public readonly name = 'Angular ' + VERSION.major;
 
   public command$ = new Subject<boolean>();
   public commandDisabled$ = new BehaviorSubject<boolean>(false);
@@ -34,10 +34,10 @@ export class CommandComponent implements OnInit {
         tap(() => this.commandDisabled$.next(true)),
         mergeMap(() => timer(2000)),
         tap(() => {
-          console.log("I have done executing");
+          console.log('I have done executing');
         }),
         finalize(() => this.commandDisabled$.next(false)),
-        takeUntil(this._destroyed$)
+        takeUntil(this._destroyed$),
       )
       .subscribe();
 
@@ -47,12 +47,12 @@ export class CommandComponent implements OnInit {
         mergeMap((num) =>
           timer(2000).pipe(
             tap(() => {
-              console.log("I have done executing with param ", num);
-            })
-          )
+              console.log('I have done executing with param ', num);
+            }),
+          ),
         ),
         finalize(() => this.otherCommandDisabled$.next(false)),
-        takeUntil(this._destroyed$)
+        takeUntil(this._destroyed$),
       )
       .subscribe();
   }
