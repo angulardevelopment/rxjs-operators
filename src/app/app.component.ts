@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { Router, Routes } from '@angular/router';
+import { Router, RouterModule, Routes } from '@angular/router';
 import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [RouterModule],
 })
 export class AppComponent {
   DEMO() {
