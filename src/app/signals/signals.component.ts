@@ -498,6 +498,13 @@ export class App {
 // @angular/core:signal-queries-migration
 // @angular/core:output-migration
 
+// for each new project migrate to new things
+// ng generate @angular/core:signals
+// ng generate @angular/core:standalone
+// ng generate @angular/core:inject
+// ng generate @angular/core:control-flow
+// ng generate @angular/core:route-lazy-loading
+
 // New reactive primitives:
 // afterRenderEffect -> Combines effect + afterRender hook:
 // effect track reactive dependencies
