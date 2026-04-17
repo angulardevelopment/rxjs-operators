@@ -8,10 +8,18 @@ import { SmartComponent } from './smart/smart.component';
 import { CommandComponent } from './command/command.component';
 export const routes: Routes = [
   // Add your routes here
-  { path: 'SignalsComponent', component: SignalsComponent },
+  { path: 'signals', component: SignalsComponent },
   { path: '', component: TestComponent },
-  { path: 'PatternComponent', component: PatternComponent },
-  { path: 'TipsAndTricksComponent', component: TipsAndTricksComponent },
-  { path: 'SmartComponent', component: SmartComponent },
-  { path: 'CommandComponent', component: CommandComponent },
+  { path: 'pattern', component: PatternComponent },
+  { path: 'tips-and-tricks', component: TipsAndTricksComponent },
+  { path: 'smart', component: SmartComponent },
+  { path: 'command', component: CommandComponent },
 ];
+
+    // SmartStateComponent,
+    // SmartStoreDirective,
+    // SmartStoreComponent,
+    // DumbComponent,
+    // Dumb1Component,
+    // Dumb2Component,
+    // Dumb3Component,

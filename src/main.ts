@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app/app.routes'; // Your application routes
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AsyncPipe, CommonModule } from '@angular/common';
 
 if (environment.production) {
   enableProdMode();
@@ -24,7 +25,7 @@ const appConfig: ApplicationConfig = {
     // ... other providers like provideAnimations()
     BrowserModule,
     FormsModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule
   ],
 };
 

@@ -24,12 +24,15 @@ import { z } from 'zod';
 import { ApiService, Todo } from '../services/api.service';
 import { BehaviorSubject, from, map, Observable, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { AsyncPipe, CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-signals',
   templateUrl: './signals.component.html',
   styleUrls: ['./signals.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [AsyncPipe, CommonModule, ReactiveFormsModule, FormsModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
