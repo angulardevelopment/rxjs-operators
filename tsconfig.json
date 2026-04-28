@@ -17,7 +17,8 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+     "skipLibCheck": true // To fix zod-fixture issues
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

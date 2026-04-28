@@ -1,12 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SmartStoreService } from './smart-store.service';
+import { AsyncPipe } from '@angular/common';
+import { DumbComponent } from '../dumb/dumb.component';
 
 @Component({
   selector: 'app-smart',
   templateUrl: './smart.component.html',
   providers: [SmartStoreService],
-  standalone: false,
+  standalone: true,
+  imports: [AsyncPipe, DumbComponent],
+
 })
 export class SmartComponent implements OnInit {
   @Input() user;
